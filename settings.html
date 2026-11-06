@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings · Onward</title>
+  <meta name="description" content="Onward — a personal job application tracker that tells you what to do next.">
+  <!-- Apply the saved theme before the page paints (prevents a white flash in dark mode) -->
+  <script>try{var s=JSON.parse(localStorage.getItem("jobtracker_settings"))||{};var d=s.theme==="dark"||(s.theme==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-bs-theme",d?"dark":"light")}catch(e){}</script>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body data-page="settings">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header id="site-header"></header>
+
+  <main id="main" class="container-xl pb-5" style="max-width: 900px;">
+    <div id="alerts"></div>
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Settings</h1>
+        <p class="page-sub">Make Onward yours. Everything here is saved in this browser only.</p>
+      </div>
+    </div>
+
+    <section class="panel mb-4" aria-labelledby="set-you">
+      <h2 class="panel-title mb-3" id="set-you">You</h2>
+      <form id="profile-form" novalidate>
+        <div class="settings-row">
+          <div>
+            <h3><label for="s-name">Your name</label></h3>
+            <p>Used to greet you and to sign the follow-up messages we draft for you.</p>
+          </div>
+          <input class="form-control" style="max-width: 280px;" id="s-name" autocomplete="name" placeholder="e.g. Ananya Rao">
+        </div>
+        <div class="settings-row">
+          <div>
+            <h3><label for="s-days">Default follow-up reminder</label></h3>
+            <p>When you add an application, we suggest following up after this many days.</p>
+          </div>
+          <select class="form-select" style="max-width: 180px;" id="s-days">
+            <option value="5">5 days</option>
+            <option value="7">7 days</option>
+            <option value="10">10 days</option>
+            <option value="14">14 days</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div>
+            <h3 id="theme-label">Appearance</h3>
+            <p>Light, dark, or follow your device.</p>
+          </div>
+          <div class="segmented" role="radiogroup" aria-labelledby="theme-label">
+            <input type="radio" class="btn-check" name="theme" id="t-light" value="light"><label class="btn btn-sm" for="t-light">Light</label>
+            <input type="radio" class="btn-check" name="theme" id="t-dark" value="dark"><label class="btn btn-sm" for="t-dark">Dark</label>
+            <input type="radio" class="btn-check" name="theme" id="t-system" value="system"><label class="btn btn-sm" for="t-system">System</label>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel mb-4" aria-labelledby="set-data">
+      <h2 class="panel-title mb-3" id="set-data">Your data</h2>
+      <div class="settings-row">
+        <div>
+          <h3>Export to a spreadsheet</h3>
+          <p>Download every application as a CSV file you can open in Excel or Google Sheets.</p>
+        </div>
+        <button class="btn btn-light" type="button" data-action="export-csv">Export CSV</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <h3>Back up and restore</h3>
+          <p>Save a backup file, then restore it on another browser or after clearing your data.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-light" type="button" data-action="export-json">Download backup</button>
+          <label class="btn btn-light mb-0" for="import-file">Restore backup</label>
+          <input type="file" id="import-file" accept=".json,application/json" class="visually-hidden">
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <h3>Reset demo data</h3>
+          <p>Replace everything with the sample applications. Useful for demos.</p>
+        </div>
+        <button class="btn btn-light" type="button" data-action="reset-demo">Reset demo data</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <h3>Delete all applications</h3>
+          <p>Start fresh with an empty tracker. This can't be undone, so download a backup first.</p>
+        </div>
+        <button class="btn btn-outline-danger" type="button" data-action="clear-all">Delete everything</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="set-about">
+      <h2 class="panel-title mb-2" id="set-about">About Onward</h2>
+      <p class="text-secondary">Onward is a personal job application tracker for students. It tells you what to do next, drafts your follow-up messages, and celebrates your effort — not just your results.</p>
+      <h3 class="h6 mt-3">Privacy</h3>
+      <p class="text-secondary">There's no account and no server. Your applications are stored only in this browser's localStorage, and nothing is sent anywhere. Messages are drafted for you to copy — Onward never sends emails.</p>
+      <h3 class="h6 mt-3">Good to know</h3>
+      <ul class="limit-list">
+        <li>Your records live in this browser only and don't sync between devices.</li>
+        <li>Clearing your browser data removes your applications — use “Download backup” regularly.</li>
+        <li>Reminders appear inside Onward; there are no email or push notifications.</li>
+        <li>Sample companies, people and emails are fictional.</li>
+      </ul>
+      <h3 class="h6 mt-3">Keyboard shortcuts</h3>
+      <p class="text-secondary mb-0"><kbd>N</kbd> add an application · <kbd>/</kbd> jump to search (on the Applications page)</p>
+    </section>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/sample-data.js"></script>
+  <script src="js/applications.js"></script>
+  <script src="js/follow-ups.js"></script>
+  <script src="js/coach.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/settings.js"></script>
+</body>
+</html>
