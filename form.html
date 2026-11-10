@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add or edit application · Onward</title>
+  <meta name="description" content="Onward — a personal job application tracker that tells you what to do next.">
+  <!-- Apply the saved theme before the page paints (prevents a white flash in dark mode) -->
+  <script>try{var s=JSON.parse(localStorage.getItem("jobtracker_settings"))||{};var d=s.theme==="dark"||(s.theme==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-bs-theme",d?"dark":"light")}catch(e){}</script>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body data-page="applications">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header id="site-header"></header>
+
+  <main id="main" class="container-xl pb-4">
+    <div id="alerts"></div>
+    <a class="back-link" id="back-link" href="applications.html">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+      Back
+    </a>
+    <div class="page-header mt-2">
+      <div>
+        <h1 class="page-title" id="form-title">Add an application</h1>
+        <p class="page-sub" id="form-sub">Only the <span class="req">*</span> fields are needed. Skip anything you don't know yet, you can always come back.</p>
+      </div>
+    </div>
+
+    <div id="not-found"></div>
+
+    <form id="app-form" novalidate>
+      <div class="alert alert-danger d-none" id="form-summary" role="alert" tabindex="-1"></div>
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <!-- Job basics -->
+          <section class="form-section" aria-labelledby="sec-job">
+            <h2 class="form-section-title" id="sec-job"><span class="step-no" aria-hidden="true">1</span>The job</h2>
+            <p class="form-section-sub">Paste the link first. We'll fill in whatever we can from it.</p>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="f-jobUrl">Job posting link <span class="optional">optional</span></label>
+                <input type="url" class="form-control" id="f-jobUrl" name="jobUrl" placeholder="https://…" aria-describedby="f-jobUrl-hint f-jobUrl-error">
+                <div class="form-text smart-hint" id="f-jobUrl-hint" aria-live="polite"></div>
+                <div class="invalid-feedback" id="f-jobUrl-error"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="f-company">Company name <span class="req" aria-hidden="true">*</span></label>
+                <input class="form-control" id="f-company" name="company" required aria-required="true" aria-describedby="f-company-error" autocomplete="organization">
+                <div class="invalid-feedback" id="f-company-error"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="f-jobTitle">Job title <span class="req" aria-hidden="true">*</span></label>
+                <input class="form-control" id="f-jobTitle" name="jobTitle" required aria-required="true" aria-describedby="f-jobTitle-error" placeholder="e.g. Software Development Intern">
+                <div class="invalid-feedback" id="f-jobTitle-error"></div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="f-jobType">Job type</label>
+                <select class="form-select" id="f-jobType" name="jobType"></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="f-location">Location <span class="optional">optional</span></label>
+                <input class="form-control" id="f-location" name="location" placeholder="e.g. Bengaluru, Remote">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="f-source">Where did you find it?</label>
+                <select class="form-select" id="f-source" name="source"></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="f-salary">Salary or stipend <span class="optional">optional</span></label>
+                <input class="form-control" id="f-salary" name="salary" placeholder="e.g. ₹20,000 / month">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="f-priority">Priority</label>
+                <select class="form-select" id="f-priority" name="priority"></select>
+              </div>
+            </div>
+          </section>
+
+          <!-- Notes -->
+          <section class="form-section" aria-labelledby="sec-notes">
+            <h2 class="form-section-title" id="sec-notes"><span class="step-no" aria-hidden="true">2</span>Notes</h2>
+            <p class="form-section-sub">How you applied, questions to ask, anything future you should know.</p>
+            <label class="form-label visually-hidden" for="f-notes">Notes</label>
+            <textarea class="form-control" id="f-notes" name="notes" rows="5"></textarea>
+          </section>
+        </div>
+
+        <div class="col-lg-5">
+          <!-- Status & dates -->
+          <section class="form-section" aria-labelledby="sec-status">
+            <h2 class="form-section-title" id="sec-status"><span class="step-no" aria-hidden="true">3</span>Where it stands</h2>
+            <p class="form-section-sub">Dates are how we know when to remind you.</p>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="f-status">Application status <span class="req" aria-hidden="true">*</span></label>
+                <select class="form-select" id="f-status" name="status" required aria-required="true" aria-describedby="f-status-explain f-status-error"></select>
+                <div class="status-explain" id="f-status-explain"></div>
+                <div class="invalid-feedback" id="f-status-error"></div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="f-applicationDate">Application date <span class="req" aria-hidden="true">*</span></label>
+                <input type="date" class="form-control" id="f-applicationDate" name="applicationDate" required aria-required="true" aria-describedby="f-applicationDate-hint f-applicationDate-error">
+                <div class="form-text" id="f-applicationDate-hint">For "Interested", use the date you saved it.</div>
+                <div class="invalid-feedback" id="f-applicationDate-error"></div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="f-deadline">Application deadline <span class="optional">optional</span></label>
+                <input type="date" class="form-control" id="f-deadline" name="deadline" aria-describedby="f-deadline-error">
+                <div class="invalid-feedback" id="f-deadline-error"></div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="f-followUpDate">Follow-up date <span class="optional">optional</span></label>
+                <input type="date" class="form-control" id="f-followUpDate" name="followUpDate" aria-describedby="f-followUpDate-hint f-followUpDate-error">
+                <div class="form-text" id="f-followUpDate-hint"><button type="button" class="btn btn-link btn-sm p-0" id="suggest-followup">Suggest a date</button></div>
+                <div class="invalid-feedback" id="f-followUpDate-error"></div>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label" for="f-interviewDate">Interview date <span class="optional">optional</span></label>
+                <input type="date" class="form-control" id="f-interviewDate" name="interviewDate" aria-describedby="f-interviewDate-error">
+                <div class="invalid-feedback" id="f-interviewDate-error"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Recruiter -->
+          <section class="form-section" id="recruiter" aria-labelledby="sec-recruiter">
+            <h2 class="form-section-title" id="sec-recruiter"><span class="step-no" aria-hidden="true">4</span>Who to contact</h2>
+            <p class="form-section-sub">The recruiter (the person hiring), if you know them. Most postings don't list one, and that's fine.</p>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="f-recruiterName">Name <span class="optional">optional</span></label>
+                <input class="form-control" id="f-recruiterName" name="recruiterName" autocomplete="off">
+              </div>
+              <div class="col-sm-7">
+                <label class="form-label" for="f-recruiterEmail">Email <span class="optional">optional</span></label>
+                <input type="email" class="form-control" id="f-recruiterEmail" name="recruiterEmail" aria-describedby="f-recruiterEmail-error" autocomplete="off">
+                <div class="invalid-feedback" id="f-recruiterEmail-error"></div>
+              </div>
+              <div class="col-sm-5">
+                <label class="form-label" for="f-recruiterPhone">Phone <span class="optional">optional</span></label>
+                <input type="tel" class="form-control" id="f-recruiterPhone" name="recruiterPhone" aria-describedby="f-recruiterPhone-error" autocomplete="off">
+                <div class="invalid-feedback" id="f-recruiterPhone-error"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-light btn-lg" id="cancel-link" href="applications.html">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg" id="save-btn">Save application</button>
+      </div>
+    </form>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/sample-data.js"></script>
+  <script src="js/applications.js"></script>
+  <script src="js/follow-ups.js"></script>
+  <script src="js/coach.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/form.js"></script>
+</body>
+</html>
