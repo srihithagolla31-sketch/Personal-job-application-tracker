@@ -1,5 +1,5 @@
 /**
- * views.js — pure HTML renderers. Each view receives a context object and
+ * views.js: pure HTML renderers. Each view receives a context object and
  * returns markup; all user text goes through escapeHtml.
  */
 (function (JT) {
@@ -18,7 +18,7 @@
 
   function followPill(app, today, { long = false } = {}) {
     const st = FU().getFollowUpState(app, today);
-    if (st === 'none') return '<span class="fu-pill fu-none" title="No follow-up scheduled">—<span class="visually-hidden">No follow-up</span></span>';
+    if (st === 'none') return '<span class="fu-pill fu-none" title="No follow-up scheduled">Not set</span>';
     const m = FU().STATE_META[st];
     const showLabel = long || st === 'overdue' || st === 'today';
     return `<span class="fu-pill fu-${m.tone}" title="${esc(m.label)} · ${esc(U.formatDate(app.followUpDate))} (${esc(U.relativeDays(app.followUpDate, today))})">
@@ -37,7 +37,7 @@
 
   function emptyState({ icon = 'bi-inbox', title, text, action = '' }) {
     return `<div class="empty-state"><div class="empty-icon"><i class="bi ${icon}" aria-hidden="true"></i></div>
-      <h3 class="h5">${esc(title)}</h3><p>${esc(text)}</p>${action}</div>`;
+      <h3>${esc(title)}</h3><p>${esc(text)}</p>${action}</div>`;
   }
 
   function statusSelect(app, cls = '') {
@@ -72,7 +72,7 @@
     const overdue = FU().getOverdueFollowUps(apps, today);
     if (overdue.length) {
       const a = overdue[0];
-      return { icon: 'bi-exclamation-triangle', tone: 'danger', text: `Follow up with <b>${esc(a.company)}</b> — it was due ${esc(U.relativeDays(a.followUpDate, today))}.`, href: `#/app/${encodeURIComponent(a.id)}`, cta: 'Review' };
+      return { icon: 'bi-exclamation-triangle', tone: 'danger', text: `Follow up with <b>${esc(a.company)}</b>. It was due ${esc(U.relativeDays(a.followUpDate, today))}.`, href: `#/app/${encodeURIComponent(a.id)}`, cta: 'Review' };
     }
     const interview = apps.filter((a) => a.interviewDate && a.interviewDate >= today && !JT.applications.isClosed(a) && U.diffDays(today, a.interviewDate) <= 7)
       .sort((a, b) => a.interviewDate.localeCompare(b.interviewDate))[0];
@@ -88,17 +88,15 @@
     if (deadline) {
       return { icon: 'bi-hourglass-split', tone: 'warning', text: `Apply to <b>${esc(deadline.company)}</b> before the deadline ${esc(U.relativeDays(deadline.deadline, today))}.`, href: `#/app/${encodeURIComponent(deadline.id)}`, cta: 'Open' };
     }
-    return { icon: 'bi-check2-circle', tone: 'success', text: 'You\'re all caught up. Log a new application to keep your streak alive.', action: 'add-app', cta: 'Add' };
+    return { icon: 'bi-check2-circle', tone: 'success', text: 'You\'re all caught up. Nothing needs your attention right now.', action: 'add-app', cta: 'Add application' };
   }
 
-  function statCard({ label, value, icon, tone, sub, href, suffix = '' }) {
-    return `<div class="col-6 col-md-4 col-xl-2">
-      <a class="stat-card tone-${tone}" href="${href}" data-tilt>
-        <span class="stat-icon"><i class="bi ${icon}" aria-hidden="true"></i></span>
+  function statCard({ label, value, tone, sub, href, suffix = '' }) {
+    return `<a class="stat-card tone-${tone}" href="${href}">
         <span class="stat-label">${esc(label)}</span>
         <span class="stat-value" data-count="${value}" data-suffix="${suffix}">${value}${suffix}</span>
         <span class="stat-sub">${sub}</span>
-      </a></div>`;
+      </a>`;
   }
 
   function pipelineTrack(apps) {
@@ -133,7 +131,7 @@
       </div>
       ${followPill(app, today, { long: !compact })}
       <div class="row-actions">
-        <button class="btn btn-icon btn-sm btn-ok" data-action="complete-followup" data-id="${esc(app.id)}" aria-label="Mark follow-up complete for ${esc(app.company)}" title="Mark Follow-up Complete"><i class="bi bi-check-lg"></i></button>
+        <button class="btn btn-icon btn-sm btn-ok" data-action="complete-followup" data-id="${esc(app.id)}" aria-label="Mark follow-up complete for ${esc(app.company)}" title="Mark follow-up complete"><i class="bi bi-check-lg"></i></button>
         <button class="btn btn-icon btn-sm" data-action="snooze" data-days="3" data-id="${esc(app.id)}" aria-label="Reschedule ${esc(app.company)} follow-up by 3 days" title="Snooze 3 days"><i class="bi bi-clock-history"></i></button>
         ${compact ? '' : `<button class="btn btn-icon btn-sm" data-action="schedule-followup" data-id="${esc(app.id)}" aria-label="Pick a new follow-up date for ${esc(app.company)}" title="Reschedule"><i class="bi bi-calendar2-week"></i></button>`}
       </div>
@@ -153,27 +151,27 @@
   }
 
   function achievementTile(a, { mini = false } = {}) {
-    return `<div class="ach ${a.unlocked ? 'unlocked' : 'locked'} tier-${a.tier} ${mini ? 'mini' : ''}" data-flip="ach-${a.id}${mini ? '-mini' : ''}" ${mini ? '' : 'data-tilt'} title="${esc(a.title)} — ${esc(a.desc)}">
+    return `<div class="ach ${a.unlocked ? 'unlocked' : 'locked'} tier-${a.tier} ${mini ? 'mini' : ''}" data-flip="ach-${a.id}${mini ? '-mini' : ''}" title="${esc(a.title)}: ${esc(a.desc)}">
       <div class="ach-badge"><i class="bi ${a.unlocked ? a.icon : 'bi-lock-fill'}" aria-hidden="true"></i></div>
       <div class="ach-body min-w-0">
         <div class="ach-title">${esc(a.title)} ${a.unlocked ? `<span class="tier-tag">${JT.game.TIERS[a.tier]}</span>` : ''}</div>
         <div class="ach-desc">${esc(a.desc)}</div>
-        ${a.unlocked ? (mini ? '' : `<div class="ach-meta"><i class="bi bi-patch-check-fill" aria-hidden="true"></i> Unlocked${a.unlockedAt ? ` · ${esc(U.formatDate(U.localDateOf(a.unlockedAt)))}` : ''}</div>`)
+        ${a.unlocked ? (mini ? '' : `<div class="ach-meta"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Unlocked${a.unlockedAt ? ` · ${esc(U.formatDate(U.localDateOf(a.unlockedAt)))}` : ''}</div>`)
           : `<div class="ach-progress" role="progressbar" aria-label="${esc(a.title)} progress" aria-valuemin="0" aria-valuemax="${a.target}" aria-valuenow="${a.current}"><span style="width:${a.pct}%"></span></div><div class="ach-meta">${a.current} / ${a.target}</div>`}
       </div></div>`;
   }
 
   function dashboard(ctx) {
-    const { apps, today, player, stats, settings, achievements } = ctx;
+    const { apps, today, player, stats, achievements, displayName } = ctx;
     if (!apps.length) {
-      return `<section class="panel hero-empty text-center">
-        <div class="empty-icon big"><i class="bi bi-controller" aria-hidden="true"></i></div>
-        <p class="eyebrow">New game</p>
-        <h1 class="h2">Your job search starts here.</h1>
-        <p class="lead text-muted mx-auto" style="max-width:560px">Add your first application to keep every opportunity organized — and start earning XP for every step you take.</p>
+      return `<div class="page-head"><div><h1>Dashboard</h1><p class="page-sub">Welcome, ${esc(displayName)}.</p></div></div>
+      <section class="panel hero-empty text-center">
+        <div class="empty-icon big"><i class="bi bi-briefcase" aria-hidden="true"></i></div>
+        <h2 class="h4 mt-3">No applications yet</h2>
+        <p class="text-muted mx-auto" style="max-width:480px">Add the first job or internship you've applied to. You can track its status, follow-ups and recruiter contact from here.</p>
         <div class="d-flex gap-2 justify-content-center flex-wrap mt-3">
-          <button class="btn btn-primary btn-lg" data-action="add-app" data-magnetic><i class="bi bi-plus-lg" aria-hidden="true"></i> Add Application</button>
-          <button class="btn btn-outline-secondary btn-lg" data-action="reset-demo" data-magnetic><i class="bi bi-joystick" aria-hidden="true"></i> Load demo data</button>
+          <button class="btn btn-primary" data-action="add-app"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add application</button>
+          <button class="btn btn-outline-secondary" data-action="reset-demo">Load sample data</button>
         </div></section>`;
     }
 
@@ -185,87 +183,68 @@
     const unlocked = achievements.filter((a) => a.unlocked).sort((a, b) => String(b.unlockedAt).localeCompare(String(a.unlockedAt)));
     const nextUp = achievements.filter((a) => !a.unlocked).sort((a, b) => b.pct - a.pct).slice(0, 2);
 
-    const firstDay = apps.reduce((m, a) => (a.createdAt < m ? a.createdAt : m), apps[0].createdAt);
-    const dayN = Math.max(1, U.diffDays(U.localDateOf(firstDay), today) + 1);
-
     return `
-    <section class="hero-strip hero-cosmos" aria-label="Mission control">
-      <div class="hero-copy">
-        <p class="eyebrow mb-3">// Season ${today.slice(0, 4)} · Day ${dayN} of the hunt</p>
-        <h1 class="hero-title"><span class="ht-line ht-outline">Boost</span><span class="ht-line">your</span><span class="ht-line">career</span></h1>
-        <p class="hero-sub">Track every application at the intersection of <b>ambition</b> and <b>follow-through</b>, helping you <b>land the offer</b>, today.</p>
-        <div class="hero-actions">
-          <button class="btn btn-primary btn-lg" data-action="add-app" data-magnetic><i class="bi bi-plus-lg" aria-hidden="true"></i> Add application</button>
-          <button type="button" class="hero-orb" data-action="scroll-overview" data-magnetic aria-label="Jump to your overview"><i class="bi bi-arrow-down" aria-hidden="true"></i></button>
-        </div>
-        <div class="hero-meta mono" aria-label="Status readout">
-          <span class="hm-live"><span class="live-dot" aria-hidden="true"></span>Signal live</span>
-          <span>LVL <b>${player.level}</b></span>
-          <span>XP <b>${player.xp.toLocaleString()}</b></span>
-          <span>Streak <b>${player.streak.current}d</b></span>
-          <span>Offers <b>${stats.offers}</b></span>
-        </div>
-      </div>
-    </section>
-    <span id="overview"></span>
-    <section class="row g-3 mb-3" aria-label="Player overview">
+    <div class="page-head">
+      <div><h1>Dashboard</h1><p class="page-sub">Welcome back, ${esc(displayName)}. Here is where your search stands on ${esc(U.formatDate(today))}.</p></div>
+    </div>
+    <section class="row g-3 mb-3" aria-label="Progress">
       <div class="col-xl-8">
         <div class="panel player-card h-100">
           <div class="d-flex gap-3 align-items-center flex-wrap flex-sm-nowrap">
             ${levelRing(player)}
             <div class="flex-grow-1 min-w-0">
-              <p class="eyebrow mb-1">Your job search · ${esc(U.formatDate(today))}</p>
-              <h2 class="h3 mb-1 text-truncate">Welcome back, ${esc(settings.playerName)}</h2>
-              <p class="text-muted mb-2 small"><i class="bi bi-shield-fill-check rank-icon" aria-hidden="true"></i> <b class="text-body">${esc(player.rank)}</b> · ${player.xp.toLocaleString()} XP total${player.todayXp ? ` · <span class="text-xp">+${player.todayXp} today</span>` : ''}</p>
+              <p class="eyebrow mb-1">Your progress</p>
+              <h2 class="h4 mb-1 text-truncate">${esc(player.rank)}</h2>
+              <p class="text-muted mb-2 small">${player.xp.toLocaleString()} XP total${player.todayXp ? ` · <span class="text-xp">+${player.todayXp} today</span>` : ''}</p>
               ${xpBar(player)}
             </div>
-            <a class="streak-box ${player.streak.activeToday ? 'lit' : ''}" href="#/trophies" data-tilt aria-label="${player.streak.current} day streak${player.streak.activeToday ? '' : ', log activity today to keep it'}">
+            <a class="streak-box ${player.streak.activeToday ? 'lit' : ''}" href="#/trophies" aria-label="${player.streak.current} day streak${player.streak.activeToday ? '' : ', log activity today to keep it'}">
               <i class="bi bi-fire" aria-hidden="true"></i><b>${player.streak.current}</b><span>day streak</span>
             </a>
           </div>
           <div class="next-move tone-${move.tone} mt-3">
             <span class="nm-icon"><i class="bi ${move.icon}" aria-hidden="true"></i></span>
-            <div class="flex-grow-1 min-w-0"><span class="eyebrow">Next best move</span><p class="mb-0">${move.text}</p></div>
-            ${move.href ? `<a class="btn btn-sm btn-outline-primary" data-magnetic href="${move.href}">${move.cta}</a>` : `<button class="btn btn-sm btn-outline-primary" data-action="${move.action}">${move.cta}</button>`}
+            <div class="flex-grow-1 min-w-0"><span class="eyebrow">Suggested next step</span><p class="mb-0">${move.text}</p></div>
+            ${move.href ? `<a class="btn btn-sm btn-outline-primary" href="${move.href}">${move.cta}</a>` : `<button class="btn btn-sm btn-outline-primary" data-action="${move.action}">${move.cta}</button>`}
           </div>
         </div>
       </div>
       <div class="col-xl-4">
         <div class="panel h-100">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-list-check" aria-hidden="true"></i> Daily quests</h2><span class="mono small text-xp">+${JT.game.XP_RULES.quest} XP each</span></div>
+          <div class="panel-head"><h2 class="panel-title">Daily quests</h2><span class="small text-muted">+${JT.game.XP_RULES.quest} XP each</span></div>
           <ul class="quest-list">
             ${player.quests.map((q) => `<li class="quest ${q.done ? 'done' : ''}" data-flip="quest-${q.id}">
               <span class="quest-check"><i class="bi ${q.done ? 'bi-check-lg' : q.icon}" aria-hidden="true"></i></span>
               <div class="flex-grow-1 min-w-0"><div class="quest-title">${esc(q.title)}</div>
                 <div class="quest-bar"><span style="width:${(q.current / q.target) * 100}%"></span></div></div>
-              <span class="quest-count mono">${q.current}/${q.target}</span>
+              <span class="quest-count tnum">${q.current}/${q.target}</span>
               <span class="visually-hidden">${q.done ? 'Completed' : 'In progress'}</span>
             </li>`).join('')}
           </ul>
-          <p class="small text-muted mb-0 mt-2"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Quests reset at midnight.</p>
+          <p class="small text-muted mb-0 mt-2">Quests reset at midnight.</p>
         </div>
       </div>
     </section>
 
-    <section class="row g-3 mb-3" aria-label="Summary metrics">
-      ${statCard({ label: 'Total', value: stats.total, icon: 'bi-collection', tone: 'primary', sub: `${stats.updatedThisWeek} updated this week`, href: '#/applications' })}
-      ${statCard({ label: 'Active', value: stats.active, icon: 'bi-activity', tone: 'info', sub: `${stats.responseRate}% response rate`, href: '#/applications?status=active' })}
-      ${statCard({ label: 'Interviews', value: stats.interviews, icon: 'bi-people', tone: 'xp', sub: `${stats.interviewRate}% interview rate`, href: '#/applications?status=Interview' })}
-      ${statCard({ label: 'Offers', value: stats.offers, icon: 'bi-trophy', tone: 'success', sub: stats.offers ? 'Nice work!' : 'Keep pushing', href: '#/applications?status=Offer' })}
-      ${statCard({ label: 'Rejected', value: stats.rejected, icon: 'bi-x-octagon', tone: 'danger', sub: `${stats.withdrawn} withdrawn`, href: '#/applications?status=Rejected' })}
-      ${statCard({ label: 'Overdue', value: stats.overdue, icon: 'bi-alarm', tone: stats.overdue ? 'warning' : 'muted', sub: `${stats.upcoming} upcoming`, href: '#/followups' })}
+    <section class="panel stat-strip mb-3" aria-label="Summary metrics">
+      ${statCard({ label: 'Total applications', value: stats.total, tone: 'primary', sub: `${stats.updatedThisWeek} updated this week`, href: '#/applications' })}
+      ${statCard({ label: 'Active', value: stats.active, tone: 'info', sub: `${stats.responseRate}% response rate`, href: '#/applications?status=active' })}
+      ${statCard({ label: 'Interviews', value: stats.interviews, tone: 'xp', sub: `${stats.interviewRate}% interview rate`, href: '#/applications?status=Interview' })}
+      ${statCard({ label: 'Offers', value: stats.offers, tone: 'success', sub: stats.offers ? `${stats.offers === 1 ? '1 offer' : `${stats.offers} offers`} received` : 'None yet', href: '#/applications?status=Offer' })}
+      ${statCard({ label: 'Rejected', value: stats.rejected, tone: 'danger', sub: `${stats.withdrawn} withdrawn`, href: '#/applications?status=Rejected' })}
+      ${statCard({ label: 'Overdue follow-ups', value: stats.overdue, tone: stats.overdue ? 'warning' : 'muted', sub: `${stats.upcoming} upcoming`, href: '#/followups' })}
     </section>
 
     <section class="panel mb-3" aria-labelledby="pipe-title">
-      <div class="panel-head"><h2 class="panel-title" id="pipe-title"><i class="bi bi-signpost-split" aria-hidden="true"></i> Pipeline</h2>
-        <span class="small text-muted d-none d-md-inline">Click a stage to filter · % = conversion from the previous stage</span></div>
+      <div class="panel-head"><h2 class="panel-title" id="pipe-title">Pipeline</h2>
+        <span class="small text-muted d-none d-md-inline">Select a stage to filter. Percentages show conversion from the previous stage.</span></div>
       ${pipelineTrack(apps)}
     </section>
 
     <section class="row g-3 mb-3">
       <div class="col-lg-7">
         <div class="panel h-100">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-bell" aria-hidden="true"></i> Follow-ups
+          <div class="panel-head"><h2 class="panel-title">Follow-ups
             ${overdue.length ? `<span class="count-badge danger">${overdue.length} overdue</span>` : ''}</h2>
             <a class="small" href="#/followups">View all <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
           ${fuList.length ? `<ul class="fu-list">${fuList.map((a) => followRow(a, today, { compact: true })).join('')}</ul>`
@@ -274,8 +253,8 @@
       </div>
       <div class="col-lg-5">
         <div class="panel h-100">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-clock-history" aria-hidden="true"></i> Recently updated</h2>
-            <button class="btn btn-sm btn-primary" data-action="add-app" data-magnetic><i class="bi bi-plus-lg" aria-hidden="true"></i> Add New</button></div>
+          <div class="panel-head"><h2 class="panel-title">Recently updated</h2>
+            <a class="small" href="#/applications">View all <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
           <ul class="recent-list">
             ${recent.map((a) => `<li data-flip="recent-${esc(a.id)}"><a href="#/app/${encodeURIComponent(a.id)}" class="recent-item">
               ${monogram(a.company, 'sm')}
@@ -290,18 +269,18 @@
     <section class="row g-3">
       <div class="col-lg-8">
         <div class="panel h-100">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-grid-3x3" aria-hidden="true"></i> Activity</h2>
-            <span class="small text-muted"><i class="bi bi-fire text-xp" aria-hidden="true"></i> Best streak: ${player.streak.best} days</span></div>
+          <div class="panel-head"><h2 class="panel-title">Activity</h2>
+            <span class="small text-muted">Best streak: ${player.streak.best} ${player.streak.best === 1 ? 'day' : 'days'}</span></div>
           ${heatmap(player, today)}
         </div>
       </div>
       <div class="col-lg-4">
         <div class="panel h-100">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-award" aria-hidden="true"></i> Trophies <span class="count-badge">${unlocked.length}/${achievements.length}</span></h2>
-            <a class="small" href="#/trophies">All <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
-          <div class="badge-strip mb-3">${unlocked.slice(0, 6).map((a) => `<span class="mini-badge tier-${a.tier}" title="${esc(a.title)}"><i class="bi ${a.icon}" aria-hidden="true"></i><span class="visually-hidden">${esc(a.title)}</span></span>`).join('') || '<span class="small text-muted">No trophies yet — they unlock as you progress.</span>'}</div>
+          <div class="panel-head"><h2 class="panel-title">Trophies <span class="count-badge">${unlocked.length}/${achievements.length}</span></h2>
+            <a class="small" href="#/trophies">View all <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+          <div class="badge-strip mb-3">${unlocked.slice(0, 6).map((a) => `<span class="mini-badge tier-${a.tier}" title="${esc(a.title)}"><i class="bi ${a.icon}" aria-hidden="true"></i><span class="visually-hidden">${esc(a.title)}</span></span>`).join('') || '<span class="small text-muted">No trophies yet. They unlock as you make progress.</span>'}</div>
           <p class="eyebrow mb-2">Next up</p>
-          ${nextUp.map((a) => achievementTile(a, { mini: true })).join('') || '<p class="small text-muted mb-0">Every trophy unlocked. Legendary.</p>'}
+          ${nextUp.map((a) => achievementTile(a, { mini: true })).join('') || '<p class="small text-muted mb-0">You have unlocked every trophy.</p>'}
         </div>
       </div>
     </section>`;
@@ -319,14 +298,13 @@
 
     return `
     <div class="page-head">
-      <div><p class="eyebrow">Inventory</p><h1 class="h2 mb-0">All Applications</h1></div>
+      <div><h1>Applications</h1><p class="page-sub">Every job and internship you are tracking.</p></div>
       <div class="d-flex gap-2 flex-wrap">
         <div class="btn-group view-toggle" role="group" aria-label="Choose layout">
           <button class="btn btn-sm ${settings.listView === 'table' ? 'active' : ''}" data-action="set-view" data-view="table" aria-pressed="${settings.listView === 'table'}"><i class="bi bi-list-ul" aria-hidden="true"></i> List</button>
           <button class="btn btn-sm ${settings.listView === 'board' ? 'active' : ''}" data-action="set-view" data-view="board" aria-pressed="${settings.listView === 'board'}"><i class="bi bi-kanban" aria-hidden="true"></i> Board</button>
         </div>
-        <button class="btn btn-sm btn-outline-secondary" data-action="export-csv"><i class="bi bi-download" aria-hidden="true"></i> <span class="d-none d-sm-inline">Export</span> CSV</button>
-        <button class="btn btn-sm btn-primary" data-action="add-app" data-magnetic><i class="bi bi-plus-lg" aria-hidden="true"></i> Add New</button>
+        <button class="btn btn-sm btn-outline-secondary" data-action="export-csv"><i class="bi bi-download" aria-hidden="true"></i> Export CSV</button>
       </div>
     </div>
 
@@ -355,7 +333,7 @@
         </div>
       </div>
       <div class="chip-row mt-2" role="group" aria-label="Filter by status">
-        ${chip('all', 'All', apps.length, 'bi-asterisk')}${chip('active', 'Active', active, 'bi-activity')}
+        ${chip('all', 'All', apps.length)}${chip('active', 'Active', active)}
         ${JT.STATUSES.map((s) => chip(s, s, counts[s], JT.STATUS_META[s].icon)).join('')}
       </div>
     </div>
@@ -370,14 +348,14 @@
         <thead><tr><th scope="col">Company</th><th scope="col">Job title</th><th scope="col">Applied</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Follow-up</th><th scope="col" class="text-end">Actions</th></tr></thead>
         <tbody>
         ${list.map((a) => `<tr data-row-href="#/app/${encodeURIComponent(a.id)}" data-flip="row-${esc(a.id)}">
-          <td><div class="d-flex align-items-center gap-2">${monogram(a.company, 'sm')}<div class="min-w-0"><a class="row-title" href="#/app/${encodeURIComponent(a.id)}">${esc(a.company)}</a><div class="row-sub">${esc(a.location || '—')}</div></div></div></td>
+          <td><div class="d-flex align-items-center gap-2">${monogram(a.company, 'sm')}<div class="min-w-0"><a class="row-title" href="#/app/${encodeURIComponent(a.id)}">${esc(a.company)}</a><div class="row-sub">${esc(a.location || 'No location')}</div></div></div></td>
           <td><div class="fw-medium">${esc(a.jobTitle)}</div><div class="row-sub">${esc(a.jobType)}</div></td>
-          <td class="mono small text-nowrap">${esc(U.formatDate(a.applicationDate, { short: true }))}</td>
+          <td class="small text-nowrap">${esc(U.formatDate(a.applicationDate, { short: true }))}</td>
           <td style="min-width:150px">${statusSelect(a)}</td>
           <td>${priorityTag(a.priority)}</td>
           <td class="text-nowrap">${followPill(a, today)}</td>
           <td class="text-end text-nowrap">
-            <a class="btn btn-icon btn-sm" href="#/app/${encodeURIComponent(a.id)}" aria-label="View application ${esc(a.company)}" title="View Application"><i class="bi bi-eye"></i></a>
+            <a class="btn btn-icon btn-sm" href="#/app/${encodeURIComponent(a.id)}" aria-label="View application ${esc(a.company)}" title="View application"><i class="bi bi-eye"></i></a>
             <button class="btn btn-icon btn-sm" data-action="edit-app" data-id="${esc(a.id)}" aria-label="Edit ${esc(a.company)}" title="Edit"><i class="bi bi-pencil"></i></button>
             <button class="btn btn-icon btn-sm btn-danger-soft" data-action="delete-app" data-id="${esc(a.id)}" aria-label="Delete ${esc(a.company)}" title="Delete"><i class="bi bi-trash3"></i></button>
           </td></tr>`).join('')}
@@ -407,7 +385,7 @@
   }
 
   function board(list, today) {
-    return `<p class="small text-muted mb-2 d-none d-md-block"><i class="bi bi-arrows-move" aria-hidden="true"></i> Drag cards between columns to update their status — or use the status menu on each card.</p>
+    return `<p class="small text-muted mb-2 d-none d-md-block">Drag cards between columns to change their status, or use the status menu on each card.</p>
     <div class="board" role="list">
       ${JT.STATUSES.map((s) => {
         const items = list.filter((a) => a.status === s);
@@ -429,7 +407,7 @@
   function results(ctx) {
     const { apps, ui, settings, today } = ctx;
     if (!apps.length) {
-      return emptyState({ icon: 'bi-inbox', title: 'No applications yet', text: 'Your job search starts here. Add your first application to keep every opportunity organized.', action: '<button class="btn btn-primary" data-action="add-app"><i class="bi bi-plus-lg"></i> Add Application</button>' });
+      return emptyState({ icon: 'bi-inbox', title: 'No applications yet', text: 'Add your first application to start tracking its status and follow-ups.', action: '<button class="btn btn-primary" data-action="add-app"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add application</button>' });
     }
     const boardMode = settings.listView === 'board';
     const filters = boardMode ? { ...ui.filters, status: 'all' } : ui.filters;
@@ -466,7 +444,7 @@
     </ol>
     <div class="d-flex gap-2 flex-wrap mt-3 align-items-center">
       ${closed ? `<span class="closed-banner s-${JT.STATUS_META[app.status].tone}">${statusBadge(app.status)} <span>This application is closed. Pick any stage above to reopen it.</span></span>`
-        : `<button class="btn btn-sm btn-outline-danger" data-action="set-status" data-id="${esc(app.id)}" data-status="Rejected"><i class="bi bi-x-octagon" aria-hidden="true"></i> Mark Rejected</button>
+        : `<button class="btn btn-sm btn-outline-danger" data-action="set-status" data-id="${esc(app.id)}" data-status="Rejected"><i class="bi bi-x-octagon" aria-hidden="true"></i> Mark rejected</button>
            <button class="btn btn-sm btn-outline-secondary" data-action="set-status" data-id="${esc(app.id)}" data-status="Withdrawn"><i class="bi bi-box-arrow-left" aria-hidden="true"></i> Withdraw</button>`}
     </div>`;
   }
@@ -479,7 +457,7 @@
       const m = JT.STATUS_META[h.status];
       items.push({ at: h.at, icon: m.icon, tone: m.tone, text: i === 0 ? `Started as <b>${h.status}</b>` : `Status changed to <b>${h.status}</b>` });
     });
-    app.followUpLog.forEach((f) => items.push({ at: f.completedAt, icon: 'bi-check2-circle', tone: 'offer', text: `Follow-up for ${esc(U.formatDate(f.date))} completed${f.note ? ` — <i>${esc(f.note)}</i>` : ''}` }));
+    app.followUpLog.forEach((f) => items.push({ at: f.completedAt, icon: 'bi-check2-circle', tone: 'offer', text: `Follow-up for ${esc(U.formatDate(f.date))} completed${f.note ? `: <i>${esc(f.note)}</i>` : ''}` }));
     app.notesLog.forEach((n) => items.push({ at: n.at, icon: 'bi-journal-text', tone: 'interested', text: 'Note added' }));
     items.sort((a, b) => b.at.localeCompare(a.at));
     return `<ol class="timeline">${items.map((it) => `<li class="tl-item" data-flip="tl-${esc(it.at)}-${it.icon}"><span class="tl-dot s-${it.tone}"><i class="bi ${it.icon}" aria-hidden="true"></i></span>
@@ -508,7 +486,7 @@
           <div class="d-flex gap-2 flex-wrap align-items-center">${statusBadge(app.status)}${priorityTag(app.priority)}
             <span class="tag"><i class="bi bi-briefcase" aria-hidden="true"></i>${esc(app.jobType)}</span>
             ${app.location ? `<span class="tag"><i class="bi bi-geo-alt" aria-hidden="true"></i>${esc(app.location)}</span>` : ''}
-            <span class="tag mono"><i class="bi bi-hash" aria-hidden="true"></i>${esc(app.id)}</span></div>
+            <span class="tag tnum">${esc(app.id)}</span></div>
         </div>
         <div class="d-flex gap-2 flex-wrap">
           ${app.jobUrl ? `<a class="btn btn-outline-secondary" href="${esc(app.jobUrl)}" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Job posting</a>` : ''}
@@ -516,14 +494,14 @@
           <button class="btn btn-outline-danger" data-action="delete-app" data-id="${esc(app.id)}"><i class="bi bi-trash3" aria-hidden="true"></i> Delete</button>
         </div>
       </div>
-      <h2 class="eyebrow mt-4 mb-2">Update status</h2>
+      <h2 class="h5 mt-4 mb-3">Status</h2>
       ${stepper(app)}
     </div>
 
     <div class="row g-3">
       <div class="col-lg-8 d-flex flex-column gap-3">
         <section class="panel" aria-labelledby="jd-title">
-          <div class="panel-head"><h2 class="panel-title" id="jd-title"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> Job details</h2></div>
+          <div class="panel-head"><h2 class="panel-title" id="jd-title">Job details</h2></div>
           <dl class="kv-grid">
             ${field('Applied on', esc(U.formatDate(app.applicationDate)), 'bi-calendar-check')}
             ${field('Deadline', app.deadline ? `${esc(U.formatDate(app.deadline))} <span class="text-muted small">(${esc(U.relativeDays(app.deadline, today))})</span>` : '', 'bi-hourglass-split')}
@@ -535,12 +513,12 @@
         </section>
 
         <section class="panel" aria-labelledby="notes-title">
-          <div class="panel-head"><h2 class="panel-title" id="notes-title"><i class="bi bi-journal-text" aria-hidden="true"></i> Notes</h2><span class="mono small text-xp">+${JT.game.XP_RULES.note} XP / note</span></div>
+          <div class="panel-head"><h2 class="panel-title" id="notes-title">Notes</h2><span class="small text-muted">+${JT.game.XP_RULES.note} XP per note</span></div>
           ${app.notes ? `<p class="notes-main">${esc(app.notes).replace(/\n/g, '<br>')}</p>` : ''}
           <form class="note-form" data-form="note" data-id="${esc(app.id)}">
             <label for="note-input" class="visually-hidden">Add a timestamped note</label>
-            <div class="input-group"><input id="note-input" name="note" class="form-control" maxlength="1000" placeholder="Add a timestamped note — e.g. interview prep, feedback…" autocomplete="off">
-            <button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add</button></div>
+            <div class="input-group"><input id="note-input" name="note" class="form-control" maxlength="1000" placeholder="Add a timestamped note, for example interview prep or feedback" autocomplete="off">
+            <button class="btn btn-outline-secondary" type="submit">Add note</button></div>
           </form>
           <ul class="note-list">
             ${[...app.notesLog].reverse().map((n) => `<li class="note-item" data-flip="note-${esc(n.id)}"><div class="flex-grow-1 min-w-0"><p class="mb-1">${esc(n.text)}</p><time class="tl-time" datetime="${esc(n.at)}">${esc(U.formatDateTime(n.at))}</time></div>
@@ -550,23 +528,23 @@
         </section>
 
         <section class="panel" aria-labelledby="hist-title">
-          <div class="panel-head"><h2 class="panel-title" id="hist-title"><i class="bi bi-clock-history" aria-hidden="true"></i> History</h2></div>
+          <div class="panel-head"><h2 class="panel-title" id="hist-title">History</h2></div>
           ${timeline(app)}
         </section>
       </div>
 
       <aside class="col-lg-4 d-flex flex-column gap-3" aria-label="Follow-up and contact">
         <section class="panel fu-card fu-card-${st}" aria-labelledby="fu-title">
-          <div class="panel-head"><h2 class="panel-title" id="fu-title"><i class="bi bi-bell" aria-hidden="true"></i> Follow-up</h2>${st !== 'none' ? `<span class="fu-pill fu-${fm.tone}"><i class="bi ${fm.icon}" aria-hidden="true"></i><span class="fu-label">${fm.label}</span></span>` : ''}</div>
+          <div class="panel-head"><h2 class="panel-title" id="fu-title">Follow-up</h2>${st !== 'none' ? `<span class="fu-pill fu-${fm.tone}"><i class="bi ${fm.icon}" aria-hidden="true"></i><span class="fu-label">${fm.label}</span></span>` : ''}</div>
           ${st === 'none' ? `<p class="text-muted small">No follow-up scheduled. Set a date so this application shows up when it needs attention.</p>
-              <button class="btn btn-primary w-100" data-action="schedule-followup" data-id="${esc(app.id)}"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Schedule Follow-up</button>`
-            : `<p class="fu-date mono">${esc(U.formatDate(app.followUpDate))}</p>
+              <button class="btn btn-primary w-100" data-action="schedule-followup" data-id="${esc(app.id)}"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Schedule follow-up</button>`
+            : `<p class="fu-date">${esc(U.formatDate(app.followUpDate))}</p>
               <p class="small text-muted mb-2">${st === 'completed' ? 'Completed. Schedule another when you need to check in again.' : esc(U.relativeDays(app.followUpDate, today).replace(/^./, (c) => c.toUpperCase()))}</p>
               ${st === 'overdue' ? '<div class="alert alert-overdue small" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i> This follow-up is overdue. Review the application and decide whether to contact the company or reschedule it.</div>' : ''}
               ${st === 'inactive' ? '<p class="small text-muted">This application is closed, so the follow-up is hidden from active lists.</p>' : ''}
               ${app.followUpNote ? `<p class="fu-note"><i class="bi bi-chat-left-text" aria-hidden="true"></i> ${esc(app.followUpNote)}</p>` : ''}
               <div class="d-grid gap-2">
-                ${['overdue', 'today', 'upcoming'].includes(st) ? `<button class="btn btn-success" data-action="complete-followup" data-id="${esc(app.id)}"><i class="bi bi-check2-circle" aria-hidden="true"></i> Mark Follow-up Complete <span class="xp-hint">+${JT.game.XP_RULES.followup} XP</span></button>` : ''}
+                ${['overdue', 'today', 'upcoming'].includes(st) ? `<button class="btn btn-success" data-action="complete-followup" data-id="${esc(app.id)}"><i class="bi bi-check2-circle" aria-hidden="true"></i> Mark follow-up complete <span class="xp-hint">+${JT.game.XP_RULES.followup} XP</span></button>` : ''}
                 <div class="d-flex gap-2">
                   <button class="btn btn-outline-secondary flex-fill" data-action="snooze" data-days="3" data-id="${esc(app.id)}">+3 days</button>
                   <button class="btn btn-outline-secondary flex-fill" data-action="snooze" data-days="7" data-id="${esc(app.id)}">+1 week</button>
@@ -574,18 +552,18 @@
                 <button class="btn btn-outline-primary" data-action="schedule-followup" data-id="${esc(app.id)}"><i class="bi bi-calendar2-week" aria-hidden="true"></i> ${st === 'completed' ? 'Schedule another' : 'Pick a date'}</button>
                 <button class="btn btn-link btn-sm text-muted" data-action="clear-followup" data-id="${esc(app.id)}">Clear follow-up</button>
               </div>`}
-          ${app.followUpLog.length ? `<details class="mt-3"><summary class="small">Completed follow-ups (${app.followUpLog.length})</summary><ul class="small list-unstyled mt-2 mb-0">${[...app.followUpLog].reverse().map((f) => `<li class="mb-1"><i class="bi bi-check2 text-success" aria-hidden="true"></i> ${esc(U.formatDate(f.date))}${f.note ? ` — ${esc(f.note)}` : ''}</li>`).join('')}</ul></details>` : ''}
+          ${app.followUpLog.length ? `<details class="mt-3"><summary class="small">Completed follow-ups (${app.followUpLog.length})</summary><ul class="small list-unstyled mt-2 mb-0">${[...app.followUpLog].reverse().map((f) => `<li class="mb-1"><i class="bi bi-check2 text-success" aria-hidden="true"></i> ${esc(U.formatDate(f.date))}${f.note ? `: ${esc(f.note)}` : ''}</li>`).join('')}</ul></details>` : ''}
         </section>
 
         <section class="panel" aria-labelledby="ct-title">
-          <div class="panel-head"><h2 class="panel-title" id="ct-title"><i class="bi bi-person-badge" aria-hidden="true"></i> Recruiter contact</h2></div>
+          <div class="panel-head"><h2 class="panel-title" id="ct-title">Recruiter contact</h2></div>
           ${hasContact ? `<div class="contact-block">
               <div class="d-flex align-items-center gap-2 mb-2"><span class="mono-avatar t-1 sm" aria-hidden="true">${esc(U.initials(r.name || r.email))}</span><b>${esc(r.name || 'Unnamed contact')}</b></div>
               ${r.email ? `<div class="contact-line"><i class="bi bi-envelope" aria-hidden="true"></i><a href="mailto:${esc(r.email)}" class="text-break">${esc(r.email)}</a><button class="btn btn-icon btn-sm ms-auto" data-action="copy" data-text="${esc(r.email)}" aria-label="Copy email"><i class="bi bi-clipboard"></i></button></div>` : ''}
               ${r.phone ? `<div class="contact-line"><i class="bi bi-telephone" aria-hidden="true"></i><a href="tel:${esc(r.phone.replace(/[^\d+]/g, ''))}">${esc(r.phone)}</a><button class="btn btn-icon btn-sm ms-auto" data-action="copy" data-text="${esc(r.phone)}" aria-label="Copy phone number"><i class="bi bi-clipboard"></i></button></div>` : ''}
               <div class="d-flex gap-2 mt-3"><button class="btn btn-sm btn-outline-primary flex-fill" data-action="edit-app" data-id="${esc(app.id)}" data-focus="recruiterName"><i class="bi bi-pencil" aria-hidden="true"></i> Edit</button>
               <button class="btn btn-sm btn-outline-secondary flex-fill" data-action="clear-contact" data-id="${esc(app.id)}"><i class="bi bi-eraser" aria-hidden="true"></i> Clear</button></div></div>`
-            : `<p class="text-muted small">No recruiter details yet. Many postings don’t list one — add it when you find a contact.</p>
+            : `<p class="text-muted small">No recruiter details yet. Many postings don’t list one, so add it when you find a contact.</p>
               <button class="btn btn-outline-primary w-100" data-action="edit-app" data-id="${esc(app.id)}" data-focus="recruiterName"><i class="bi bi-person-plus" aria-hidden="true"></i> Add contact</button>`}
         </section>
       </aside>
@@ -628,13 +606,13 @@
     const upcoming = FU().getUpcomingFollowUps(apps, today, opts);
     const done = FU().getCompletedFollowUps(apps).slice(0, 12);
     const group = (title, icon, tone, list, emptyText) => `<section class="panel fu-group fu-group-${tone}" aria-label="${title}">
-      <div class="panel-head"><h2 class="panel-title"><i class="bi ${icon}" aria-hidden="true"></i> ${title} <span class="count-badge ${tone === 'overdue' && list.length ? 'danger' : ''}">${list.length}</span></h2></div>
-      ${list.length ? `<ul class="fu-list">${list.map((a) => followRow(a, today)).join('')}</ul>` : `<p class="text-muted small mb-0"><i class="bi bi-check2-all" aria-hidden="true"></i> ${emptyText}</p>`}
+      <div class="panel-head"><h2 class="panel-title">${title} <span class="count-badge ${tone === 'overdue' && list.length ? 'danger' : ''}">${list.length}</span></h2></div>
+      ${list.length ? `<ul class="fu-list">${list.map((a) => followRow(a, today)).join('')}</ul>` : `<p class="text-muted small mb-0">${emptyText}</p>`}
     </section>`;
 
     return `
     <div class="page-head">
-      <div><p class="eyebrow">Mission log</p><h1 class="h2 mb-0">Follow-ups</h1></div>
+      <div><h1>Follow-ups</h1><p class="page-sub">Check-ins you have scheduled with companies and recruiters.</p></div>
       <div class="form-check form-switch m-0">
         <input class="form-check-input" type="checkbox" role="switch" id="show-closed" data-setting="showClosedFollowUps" ${settings.showClosedFollowUps ? 'checked' : ''}>
         <label class="form-check-label small" for="show-closed">Include rejected &amp; withdrawn</label>
@@ -643,17 +621,17 @@
     ${!overdue.length && !upcoming.length ? `<div class="panel mb-3">${emptyState({ icon: 'bi-check2-all', title: 'No follow-ups due', text: 'There are no upcoming or overdue follow-ups. Open an application to schedule one.', action: '<a class="btn btn-outline-primary" href="#/applications">Browse applications</a>' })}</div>` : ''}
     <div class="row g-3">
       <div class="col-lg-8 d-flex flex-column gap-3">
-        ${group('Overdue', 'bi-exclamation-triangle', 'overdue', overdue, 'Nothing overdue. Nice discipline!')}
+        ${group('Overdue', 'bi-exclamation-triangle', 'overdue', overdue, 'Nothing is overdue.')}
         ${group('Due today & upcoming', 'bi-calendar-event', 'upcoming', upcoming, 'No upcoming follow-ups scheduled.')}
         <section class="panel fu-group" aria-label="Completed">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-check2-circle" aria-hidden="true"></i> Completed <span class="count-badge">${FU().getCompletedFollowUps(apps).length}</span></h2></div>
+          <div class="panel-head"><h2 class="panel-title">Completed <span class="count-badge">${FU().getCompletedFollowUps(apps).length}</span></h2></div>
           ${done.length ? `<ul class="done-list">${done.map((d) => `<li data-flip="done-${esc(d.app.id)}-${esc(d.completedAt)}"><i class="bi bi-check2-circle text-success" aria-hidden="true"></i>
             <a href="#/app/${encodeURIComponent(d.app.id)}" class="fw-medium">${esc(d.app.company)}</a><span class="text-muted small text-truncate">${esc(d.app.jobTitle)}${d.note ? ` · ${esc(d.note)}` : ''}</span>
-            <span class="ms-auto mono small text-muted text-nowrap">Done ${esc(U.formatDate(U.localDateOf(d.completedAt), { short: true }))}</span></li>`).join('')}</ul>`
+            <span class="ms-auto small text-muted text-nowrap">Done ${esc(U.formatDate(U.localDateOf(d.completedAt), { short: true }))}</span></li>`).join('')}</ul>`
             : '<p class="text-muted small mb-0">Completed follow-ups will appear here.</p>'}
         </section>
       </div>
-      <div class="col-lg-4"><section class="panel" aria-label="Follow-up calendar"><div class="panel-head"><h2 class="panel-title"><i class="bi bi-calendar3" aria-hidden="true"></i> Calendar</h2></div>${calendar(ctx)}</section></div>
+      <div class="col-lg-4"><section class="panel" aria-label="Follow-up calendar"><div class="panel-head"><h2 class="panel-title">Calendar</h2></div>${calendar(ctx)}</section></div>
     </div>`;
   }
 
@@ -665,13 +643,13 @@
     const q = ui.contactQuery.toLowerCase().trim();
     const list = q ? all.filter((c) => `${c.name} ${c.email} ${c.apps.map((a) => a.company).join(' ')}`.toLowerCase().includes(q)) : all;
     return `
-    <div class="page-head"><div><p class="eyebrow">Party</p><h1 class="h2 mb-0">Contacts</h1></div>
+    <div class="page-head"><div><h1>Contacts</h1><p class="page-sub">Recruiters saved on your applications.</p></div>
       <div class="search-box" style="min-width:min(320px,100%)"><i class="bi bi-search" aria-hidden="true"></i><label class="visually-hidden" for="contact-search">Search contacts</label>
       <input id="contact-search" type="search" class="form-control" placeholder="Search name, email or company…" value="${esc(ui.contactQuery)}" data-contact-search autocomplete="off"></div></div>
-    <p class="small text-muted">Contacts are stored on each application, so editing a contact here means editing its application.</p>
+    <p class="small text-muted">Contacts are stored on each application. To change one, edit the application it belongs to.</p>
     ${!all.length ? `<div class="panel">${emptyState({ icon: 'bi-person-lines-fill', title: 'No recruiter contacts yet', text: 'Add recruiter details to an application and they’ll show up here.' })}</div>`
       : !list.length ? `<div class="panel">${emptyState({ icon: 'bi-search', title: 'No contacts match', text: 'Try another name, email or company.' })}</div>`
-      : `<div class="row g-3">${list.map((c) => `<div class="col-md-6 col-xl-4"><article class="panel contact-card h-100" data-tilt>
+      : `<div class="row g-3">${list.map((c) => `<div class="col-md-6 col-xl-4"><article class="panel contact-card h-100">
           <div class="d-flex align-items-center gap-2 mb-2"><span class="mono-avatar t-${U.hashIndex(c.key, 6)}" aria-hidden="true">${esc(U.initials(c.name || c.email))}</span><div class="min-w-0"><b class="d-block text-truncate">${esc(c.name || 'Unnamed contact')}</b><span class="small text-muted">${c.apps.length} application${c.apps.length > 1 ? 's' : ''}</span></div></div>
           ${c.email ? `<div class="contact-line"><i class="bi bi-envelope" aria-hidden="true"></i><a href="mailto:${esc(c.email)}" class="text-break">${esc(c.email)}</a><button class="btn btn-icon btn-sm ms-auto" data-action="copy" data-text="${esc(c.email)}" aria-label="Copy email ${esc(c.email)}"><i class="bi bi-clipboard"></i></button></div>` : ''}
           ${c.phone ? `<div class="contact-line"><i class="bi bi-telephone" aria-hidden="true"></i><a href="tel:${esc(c.phone.replace(/[^\d+]/g, ''))}">${esc(c.phone)}</a></div>` : ''}
@@ -699,12 +677,12 @@
     const R = JT.game.XP_RULES;
 
     return `
-    <div class="page-head"><div><p class="eyebrow">Progress</p><h1 class="h2 mb-0">Trophy Room</h1></div></div>
+    <div class="page-head"><div><h1>Trophies</h1><p class="page-sub">Your level, XP and achievements.</p></div></div>
     <div class="row g-3 mb-3">
       <div class="col-lg-5">
         <section class="panel h-100 player-card">
           <div class="d-flex gap-3 align-items-center mb-3">${levelRing(player, 108)}
-            <div><p class="eyebrow mb-1">Current rank</p><h2 class="h3 mb-0">${esc(player.rank)}</h2><p class="text-muted mb-0 mono">${player.xp.toLocaleString()} XP</p></div></div>
+            <div><p class="eyebrow mb-1">Current rank</p><h2 class="h4 mb-0">${esc(player.rank)}</h2><p class="text-muted mb-0">${player.xp.toLocaleString()} XP</p></div></div>
           ${xpBar(player)}
           <div class="mini-stats mt-3">
             <div><b>${player.streak.current}</b><span>Streak</span></div><div><b>${player.streak.best}</b><span>Best streak</span></div>
@@ -714,14 +692,14 @@
       </div>
       <div class="col-lg-7">
         <section class="panel h-100">
-          <div class="panel-head"><h2 class="panel-title"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Where your XP comes from</h2></div>
+          <div class="panel-head"><h2 class="panel-title">Where your XP comes from</h2></div>
           <ul class="xp-breakdown">${rows.map(([label, v, icon]) => `<li><i class="bi ${icon}" aria-hidden="true"></i><span>${label}</span>
-            <span class="xpb-bar"><span style="width:${player.xp ? Math.round((v / player.xp) * 100) : 0}%"></span></span><b class="mono">${v}</b></li>`).join('')}</ul>
+            <span class="xpb-bar"><span style="width:${player.xp ? Math.round((v / player.xp) * 100) : 0}%"></span></span><b class="tnum">${v}</b></li>`).join('')}</ul>
           <details class="mt-2"><summary class="small">How XP works</summary>
             <ul class="small text-muted mt-2 mb-0">
               <li>Log an application: +${R.created} XP</li>
-              <li>First time an application reaches a stage: Applied +${R.status.Applied}, Assessment +${R.status.Assessment}, Interview +${R.status.Interview}, Offer +${R.status.Offer}, Rejected +${R.status.Rejected} (resilience)</li>
-              <li>Complete a follow-up: +${R.followup} XP · Timestamped note: +${R.note} XP (max ${R.notesCapPerApp} per application)</li>
+              <li>First time an application reaches a stage: Applied +${R.status.Applied}, Assessment +${R.status.Assessment}, Interview +${R.status.Interview}, Offer +${R.status.Offer}, Rejected +${R.status.Rejected}</li>
+              <li>Complete a follow-up: +${R.followup} XP. Timestamped note: +${R.note} XP (max ${R.notesCapPerApp} per application)</li>
               <li>Each daily quest: +${R.quest} XP. Levels follow 50·L·(L−1) cumulative XP.</li>
               <li>XP is calculated from your records, so it always matches your real progress.</li>
             </ul></details>
@@ -729,12 +707,12 @@
       </div>
     </div>
     <section class="panel mb-3" aria-labelledby="ach-title">
-      <div class="panel-head"><h2 class="panel-title" id="ach-title"><i class="bi bi-award" aria-hidden="true"></i> Achievements <span class="count-badge">${unlocked}/${achievements.length}</span></h2></div>
+      <div class="panel-head"><h2 class="panel-title" id="ach-title">Achievements <span class="count-badge">${unlocked}/${achievements.length}</span></h2></div>
       <div class="ach-grid">${[...achievements].sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.pct - a.pct).map((a) => achievementTile(a)).join('')}</div>
     </section>
     <section class="panel" aria-labelledby="log-title">
-      <div class="panel-head"><h2 class="panel-title" id="log-title"><i class="bi bi-terminal" aria-hidden="true"></i> XP log</h2></div>
-      ${recent.length ? `<ul class="xp-log">${recent.map((e) => `<li><span class="mono small text-muted">${esc(U.timeAgo(e.at))}</span><span class="flex-grow-1 min-w-0 text-truncate">${evText(e)}</span><b class="mono text-xp">+${e.xp}</b></li>`).join('')}</ul>` : '<p class="text-muted small mb-0">No XP earned yet.</p>'}
+      <div class="panel-head"><h2 class="panel-title" id="log-title">XP log</h2></div>
+      ${recent.length ? `<ul class="xp-log">${recent.map((e) => `<li><span class="mono small text-muted">${esc(U.timeAgo(e.at))}</span><span class="flex-grow-1 min-w-0 text-truncate">${evText(e)}</span><b class="tnum text-xp">+${e.xp}</b></li>`).join('')}</ul>` : '<p class="text-muted small mb-0">No XP earned yet.</p>'}
     </section>`;
   }
 
@@ -747,21 +725,22 @@
       <input class="form-check-input" type="checkbox" role="switch" id="set-${key}" data-setting="${key}" ${settings[key] ? 'checked' : ''}>
       <label class="form-check-label" for="set-${key}"><b>${label}</b><span class="d-block small text-muted">${hint}</span></label></div>`;
     return `
-    <div class="page-head"><div><p class="eyebrow">Options</p><h1 class="h2 mb-0">Settings</h1></div></div>
+    <div class="page-head"><div><h1>Settings</h1><p class="page-sub">Account, display preferences and your data.</p></div></div>
     <div class="row g-3">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <section class="panel" aria-labelledby="pf-title"><div class="panel-head"><h2 class="panel-title" id="pf-title"><i class="bi bi-person-circle" aria-hidden="true"></i> Profile &amp; display</h2></div>
+        ${accountPanel()}
+        <section class="panel" aria-labelledby="pf-title"><div class="panel-head"><h2 class="panel-title" id="pf-title">Profile &amp; display</h2></div>
           <form data-form="profile" class="mb-3"><label for="player-name" class="form-label">Display name</label>
             <div class="input-group"><input id="player-name" name="playerName" class="form-control" maxlength="40" value="${esc(settings.playerName)}"><button class="btn btn-outline-primary" type="submit">Save</button></div></form>
-          ${sw('sound', 'Sound effects', 'Short retro blips for XP, level-ups and trophies')}
-          ${sw('liveBg', '3D particle scene', 'The cosmic particle sculpture behind the app — morphs per screen and reacts to your cursor, clicks and XP')}
-          ${sw('reduceMotion', 'Reduce motion', 'Turns off confetti, count-ups and animations')}
+          ${sw('liveBg', 'Particle background', 'The 3D particle scene behind the app. It changes shape on each screen and reacts to clicks and XP')}
+          ${sw('sound', 'Sound effects', 'Play a short tone for XP, level-ups and trophies')}
+          ${sw('reduceMotion', 'Reduce motion', 'Turn off transitions and animations')}
         </section>
-        <section class="panel" aria-labelledby="kb-title"><div class="panel-head"><h2 class="panel-title" id="kb-title"><i class="bi bi-keyboard" aria-hidden="true"></i> Keyboard shortcuts</h2></div>
+        <section class="panel" aria-labelledby="kb-title"><div class="panel-head"><h2 class="panel-title" id="kb-title">Keyboard shortcuts</h2></div>
           ${shortcutsTable()}</section>
       </div>
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <section class="panel" aria-labelledby="data-title"><div class="panel-head"><h2 class="panel-title" id="data-title"><i class="bi bi-database" aria-hidden="true"></i> Your data</h2><span class="mono small text-muted">${apps.length} records · ${kb} KB</span></div>
+        <section class="panel" aria-labelledby="data-title"><div class="panel-head"><h2 class="panel-title" id="data-title">Your data</h2><span class="small text-muted">${apps.length} records · ${kb} KB</span></div>
           <p class="small text-muted">Everything is saved in this browser’s localStorage. Export a backup before clearing browser data.</p>
           <div class="d-flex flex-wrap gap-2 mb-3">
             <button class="btn btn-outline-primary" data-action="export-csv"><i class="bi bi-filetype-csv" aria-hidden="true"></i> Export CSV</button>
@@ -769,22 +748,35 @@
             <button class="btn btn-outline-secondary" data-action="import"><i class="bi bi-upload" aria-hidden="true"></i> Import CSV / JSON</button>
             <input type="file" id="import-file" accept=".csv,.json,text/csv,application/json" class="d-none" aria-label="Choose a CSV or JSON file to import">
           </div>
-          <div class="danger-zone"><p class="eyebrow mb-2">Danger zone</p>
+          <div class="danger-zone"><p class="fw-medium mb-1">Replace or delete data</p><p class="small text-muted">These actions can't be undone from the tracker.</p>
             <div class="d-flex flex-wrap gap-2">
-              <button class="btn btn-outline-warning" data-action="reset-demo"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Reset demo data</button>
+              <button class="btn btn-outline-warning" data-action="reset-demo"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Load sample data</button>
               <button class="btn btn-outline-danger" data-action="clear-all"><i class="bi bi-trash3" aria-hidden="true"></i> Delete all applications</button></div></div>
         </section>
-        <section class="panel" aria-labelledby="about-title"><div class="panel-head"><h2 class="panel-title" id="about-title"><i class="bi bi-info-circle" aria-hidden="true"></i> About JobTrack</h2></div>
-          <p class="small">A personal job &amp; internship application tracker (PRD PST_PD_044). Built with HTML, CSS, Bootstrap 5 and vanilla JavaScript — no backend, no tracking.</p>
+        <section class="panel" aria-labelledby="about-title"><div class="panel-head"><h2 class="panel-title" id="about-title">About JobTrack</h2></div>
+          <p class="small">A personal job and internship application tracker (PRD PST_PD_044). It uses HTML, CSS, Bootstrap 5 and vanilla JavaScript, and has no tracking.</p>
           <ul class="small text-muted mb-0">
             <li>Records are stored only in this browser and don’t sync between devices.</li>
-            <li>Clearing browser data removes saved applications — export a backup first.</li>
+            <li>Clearing browser data removes saved applications, so export a backup first.</li>
             <li>Reminders are in-app indicators, not email or push notifications.</li>
-            <li>This is a personal tool: there are no user accounts or cloud backups.</li>
+            <li>Sign-in is a frontend preview until an authentication server is connected. There are no cloud backups.</li>
             <li>Demo companies, contacts and links are fictional sample data.</li>
           </ul></section>
       </div>
     </div>`;
+  }
+
+  function accountPanel() {
+    const user = JT.auth.getUser();
+    if (!user) return '';
+    const preview = !JT.auth.isProduction();
+    return `<section class="panel" aria-labelledby="acct-title">
+      <div class="panel-head"><h2 class="panel-title" id="acct-title">Account</h2>${preview ? '<span class="tag">Preview mode</span>' : ''}</div>
+      <div class="account-row mb-3"><span class="user-btn" aria-hidden="true">${esc(U.initials(user.name || user.email))}</span>
+        <div class="min-w-0"><b class="d-block text-truncate">${esc(user.name || 'Signed in')}</b><span class="small text-muted text-break">${esc(user.email)}</span></div></div>
+      ${preview ? '<p class="small text-muted">No authentication server is connected yet. Your account is stored only in this browser and does not provide real security. Application data is not separated per account.</p>' : ''}
+      <button class="btn btn-outline-secondary" data-action="sign-out"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sign out</button>
+    </section>`;
   }
 
   function shortcutsTable() {
@@ -800,10 +792,10 @@
   /* ---------- HUD ---------- */
 
   function hud(player) {
-    return `<span class="hud-level" aria-hidden="true">LV ${player.level}</span>
-      <span class="hud-mid d-none d-md-flex d-xl-none d-xxl-flex"><span class="hud-rank">${esc(player.rank)}</span><span class="hud-bar"><span style="width:${player.progress}%"></span></span></span>
-      <span class="hud-streak ${player.streak.activeToday ? 'lit' : ''}" aria-hidden="true"><i class="bi bi-fire"></i>${player.streak.current}</span>
-      <span class="visually-hidden">Level ${player.level} ${esc(player.rank)}, ${player.progress}% to next level, ${player.streak.current} day streak. Open trophy room.</span>`;
+    return `<span class="hud-level" aria-hidden="true">Level ${player.level}</span>
+      <span class="hud-mid d-none d-lg-flex" aria-hidden="true"><span class="hud-bar"><span style="width:${player.progress}%"></span></span></span>
+      <span class="hud-streak ${player.streak.activeToday ? 'lit' : ''}" aria-hidden="true" title="Day streak"><i class="bi bi-fire"></i>${player.streak.current}</span>
+      <span class="visually-hidden">Level ${player.level}, ${esc(player.rank)}, ${player.progress}% to next level, ${player.streak.current} day streak. Open trophies.</span>`;
   }
 
   JT.views = {

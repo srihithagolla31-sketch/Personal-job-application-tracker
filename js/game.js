@@ -1,5 +1,5 @@
 /**
- * game.js — the progression layer. XP, level, streak and quest progress are
+ * game.js: the progression layer. XP, level, streak and quest progress are
  * DERIVED from the application records (never stored), so they can't drift
  * out of sync with the data. Only "achievement unlocked at" timestamps and the
  * last-seen level are persisted, purely to know when to celebrate.
@@ -142,7 +142,7 @@
 
   /**
    * Evaluates every achievement. `unlockedStore` is { id: timestamp } of
-   * achievements already earned — once earned, a badge stays earned.
+   * achievements already earned. Once earned, a badge stays earned.
    */
   function evaluateAchievements(apps, player, unlockedStore = {}, today = U.todayISO()) {
     const stats = JT.analytics.getApplicationStats(apps, today);

@@ -2,10 +2,10 @@
   "name": "personal-job-application-tracker",
   "version": "1.0.0",
   "private": true,
-  "description": "JobTrack — a gamified personal job & internship application tracker (HTML, CSS, Bootstrap 5, vanilla JS, localStorage).",
+  "description": "JobTrack: a gamified personal job & internship application tracker (HTML, CSS, Bootstrap 5, vanilla JS, localStorage) with a modular authentication UI.",
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "test": "node --test tests/"
+    "test": "node --test"
   },
   "engines": {
     "node": ">=18"

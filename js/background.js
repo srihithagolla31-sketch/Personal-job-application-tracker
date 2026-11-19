@@ -1,5 +1,5 @@
 /**
- * background.js — the "Cosmos" scene: a real-time 3D particle sculpture in a
+ * background.js: the "Cosmos" scene, a real-time 3D particle sculpture in a
  * starfield, rendered on a 2D canvas with additive blending (no WebGL needed).
  *
  *   • ~5,000 particles (gold / warm white / ice blue) form a sculpture that
@@ -205,10 +205,12 @@
   function setScene(route, { instant = false } = {}) {
     const name = ROUTE_SHAPE[route] || 'planet';
     const narrow = S.w < 768;
-    const hero = route === 'dashboard';
+    // Sign-in screens leave the right half free, so the sculpture shows in full there.
+    // App screens keep it softer because it sits behind content.
+    const open = ['login', 'signup', 'forgot-password'].includes(route);
     const target = narrow
-      ? { x: 0.5, y: hero ? 0.3 : 0.5, scale: hero ? 0.72 : 0.6, alpha: hero ? 0.75 : 0.4 }
-      : { x: hero ? 0.72 : 0.8, y: hero ? 0.4 : 0.56, scale: hero ? 1 : 0.78, alpha: hero ? 1 : 0.5 };
+      ? { x: 0.5, y: 0.5, scale: 0.6, alpha: 0.4 }
+      : { x: open ? 0.74 : 0.8, y: open ? 0.5 : 0.56, scale: open ? 0.95 : 0.78, alpha: open ? 0.9 : 0.5 };
     const g = gs();
     if (g && !instant && motionOK()) g.to(S.anchor, { ...target, duration: 1.6, ease: 'power3.inOut', overwrite: true });
     else Object.assign(S.anchor, target);

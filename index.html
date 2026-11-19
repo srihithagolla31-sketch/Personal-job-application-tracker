@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="en" data-theme="cosmos" data-bs-theme="dark">
+<html lang="en" data-bs-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JobTrack — Personal Job Application Tracker</title>
-  <meta name="description" content="Track job and internship applications, follow-ups and recruiter contacts — with XP, levels, quests and trophies.">
+  <title>JobTrack: Personal Job Application Tracker</title>
+  <meta name="description" content="Track job and internship applications, follow-ups and recruiter contacts in one place.">
   <meta name="theme-color" content="#030409">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
@@ -17,83 +17,64 @@
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
 
-  <div id="boot" class="boot" role="status" aria-live="polite">
-    <div class="boot-inner">
-      <div class="boot-logo"><svg class="logo-svg" viewBox="0 0 40 40" width="88" height="88" aria-hidden="true" focusable="false">
-            <rect class="lg-badge" x="1" y="1" width="38" height="38" rx="11"/>
-            <path class="lg-base" pathLength="1" d="M7.5 32.5 H32.5"/>
-            <path class="lg-path" pathLength="1" d="M9 28 L16.5 20.5 L23 24 L29.5 14"/>
-            <circle class="lg-node" cx="9" cy="28" r="2.7"/>
-            <circle class="lg-node" cx="16.5" cy="20.5" r="2.7"/>
-            <circle class="lg-node" cx="23" cy="24" r="2.7"/>
-            <circle class="lg-ring" cx="29.5" cy="12" r="5"/>
-            <g transform="translate(29.5 12)"><path class="lg-star" d="M0 -5.6 L1.44 -1.98 L5.33 -1.73 L2.33 0.76 L3.29 4.53 L0 2.45 L-3.29 4.53 L-2.33 0.76 L-5.33 -1.73 L-1.44 -1.98Z"/></g>
-            <circle class="lg-comet" r="1.9" cx="0" cy="0"><animateMotion dur="1s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1" path="M9 28 L16.5 20.5 L23 24 L29.5 14"/></circle>
-          </svg></div>
-      <p class="wordmark boot-wordmark"><span data-wm>Job</span><b data-wm>Track</b></p>
-      <p class="mono mb-2 boot-label">LOADING SAVE DATA</p>
-      <div class="boot-bar" aria-hidden="true"><span></span></div>
-    </div>
-  </div>
-
   <canvas id="world-bg" aria-hidden="true"></canvas>
-  <div id="scroll-progress" aria-hidden="true"></div>
-  <header class="app-header sticky-top">
+  <header class="app-header">
     <nav class="navbar navbar-expand-xl" aria-label="Main navigation">
-      <div class="container-xxl">
+      <div class="container-xl">
         <a class="navbar-brand brand" href="#/dashboard">
-          <svg class="logo-svg" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true" focusable="false">
-            <rect class="lg-badge" x="1" y="1" width="38" height="38" rx="11"/>
-            <path class="lg-base" pathLength="1" d="M7.5 32.5 H32.5"/>
-            <path class="lg-path" pathLength="1" d="M9 28 L16.5 20.5 L23 24 L29.5 14"/>
-            <circle class="lg-node" cx="9" cy="28" r="2.7"/>
-            <circle class="lg-node" cx="16.5" cy="20.5" r="2.7"/>
-            <circle class="lg-node" cx="23" cy="24" r="2.7"/>
-            <circle class="lg-ring" cx="29.5" cy="12" r="5"/>
-            <g transform="translate(29.5 12)"><path class="lg-star" d="M0 -5.6 L1.44 -1.98 L5.33 -1.73 L2.33 0.76 L3.29 4.53 L0 2.45 L-3.29 4.53 L-2.33 0.76 L-5.33 -1.73 L-1.44 -1.98Z"/></g>
-            <circle class="lg-comet" r="1.9" cx="0" cy="0"><animateMotion dur="1s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1" path="M9 28 L16.5 20.5 L23 24 L29.5 14"/></circle>
+          <svg class="logo-svg" viewBox="0 0 40 40" width="32" height="32" aria-hidden="true" focusable="false">
+            <rect x="1" y="1" width="38" height="38" rx="11" fill="#0b0d16" stroke="rgba(255,255,255,.28)"/>
+            <path d="M7.5 32.5 H32.5" stroke="#fff" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M9 28 L16.5 20.5 L23 24 L29.5 14" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="28" r="2.7" fill="#fff"/><circle cx="16.5" cy="20.5" r="2.7" fill="#fff"/><circle cx="23" cy="24" r="2.7" fill="#fff"/>
+            <g transform="translate(29.5 12)"><path d="M0 -5.6 L1.44 -1.98 L5.33 -1.73 L2.33 0.76 L3.29 4.53 L0 2.45 L-3.29 4.53 L-2.33 0.76 L-5.33 -1.73 L-1.44 -1.98Z" fill="#f2b544" stroke="#1e40af" stroke-width=".6" stroke-linejoin="round"/></g>
           </svg>
-          <span class="wordmark"><span data-wm>Job</span><b data-wm>Track</b></span>
+          <span class="wordmark">Job<b>Track</b></span>
         </a>
 
         <div class="d-flex align-items-center gap-2 order-xl-3 ms-auto">
-          <a class="hud-chip" id="hud" href="#/trophies" data-magnetic></a>
-          <button class="btn btn-icon d-none d-sm-inline-flex" data-action="open-palette" data-magnetic aria-label="Open command palette" title="Command palette (Ctrl+K)"><i class="bi bi-command"></i></button>
-          <button class="btn btn-primary d-none d-md-inline-flex align-items-center gap-1" data-action="add-app" data-magnetic><i class="bi bi-plus-lg" aria-hidden="true"></i> Add<span class="d-none d-xxl-inline">&nbsp;Application</span></button>
+          <a class="hud-chip d-none d-sm-inline-flex" id="hud" href="#/trophies"></a>
+          <button class="btn btn-icon d-none d-md-inline-flex" data-action="open-palette" aria-label="Open command palette" title="Command palette (Ctrl+K)"><i class="bi bi-search"></i></button>
+          <button class="btn btn-primary d-none d-md-inline-flex" data-action="add-app"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add application</button>
+          <div class="dropdown">
+            <button class="user-btn dropdown-toggle" id="user-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu"></button>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="user-menu-btn">
+              <div class="user-menu-head" id="user-menu-head"></div>
+              <a class="dropdown-item" href="#/settings"><i class="bi bi-gear" aria-hidden="true"></i> Settings</a>
+              <button class="dropdown-item" type="button" data-action="show-shortcuts"><i class="bi bi-keyboard" aria-hidden="true"></i> Keyboard shortcuts</button>
+              <hr class="dropdown-divider">
+              <button class="dropdown-item" type="button" data-action="sign-out"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sign out</button>
+            </div>
+          </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
             <i class="bi bi-list"></i>
           </button>
         </div>
 
         <div class="collapse navbar-collapse order-xl-2" id="mainNav">
-          <span class="nav-ink" id="nav-ink" aria-hidden="true"></span>
-          <ul class="navbar-nav ms-xl-3">
-            <li class="nav-item"><a class="nav-link" href="#/dashboard" data-route="dashboard"><i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="#/applications" data-route="applications"><i class="bi bi-collection" aria-hidden="true"></i> Applications</a></li>
-            <li class="nav-item"><a class="nav-link" href="#/followups" data-route="followups"><i class="bi bi-bell" aria-hidden="true"></i> Follow-ups <span class="nav-badge" id="nav-overdue" hidden></span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#/contacts" data-route="contacts"><i class="bi bi-person-lines-fill" aria-hidden="true"></i> Contacts</a></li>
-            <li class="nav-item"><a class="nav-link" href="#/trophies" data-route="trophies"><i class="bi bi-award" aria-hidden="true"></i> Trophies</a></li>
-            <li class="nav-item"><a class="nav-link" href="#/settings" data-route="settings"><i class="bi bi-gear" aria-hidden="true"></i> Settings</a></li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="#/dashboard" data-route="dashboard">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/applications" data-route="applications">Applications</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/followups" data-route="followups">Follow-ups <span class="nav-badge" id="nav-overdue" hidden></span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#/contacts" data-route="contacts">Contacts</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/trophies" data-route="trophies">Trophies</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/settings" data-route="settings">Settings</a></li>
           </ul>
         </div>
       </div>
     </nav>
-    <div class="ticker" id="ticker" aria-label="Live activity feed">
-      <span class="ticker-tag"><span class="live-dot" aria-hidden="true"></span>Live feed</span>
-      <div class="ticker-viewport"><div class="ticker-track" id="ticker-track"></div></div>
-    </div>
   </header>
 
-  <div id="banner" class="container-xxl"></div>
+  <div id="banner" class="container-xl"></div>
 
-  <main id="main" class="container-xxl py-4" tabindex="-1"></main>
+  <main id="main" class="container-xl py-4" tabindex="-1"></main>
 
-  <footer class="app-footer container-xxl">
-    <span>JobTrack · personal tracker · data stays in this browser</span>
+  <footer class="app-footer container-xl">
+    <span>JobTrack. Your application data is stored in this browser.</span>
     <button class="btn btn-link btn-sm p-0" data-action="show-shortcuts"><kbd>?</kbd> shortcuts</button>
   </footer>
 
-  <button class="fab d-md-none" data-action="add-app" data-magnetic aria-label="Add application"><i class="bi bi-plus-lg"></i></button>
+  <button class="fab d-md-none" data-action="add-app" aria-label="Add application"><i class="bi bi-plus-lg"></i></button>
 
   <!-- Add / edit application -->
   <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalTitle" aria-hidden="true">
@@ -101,14 +82,14 @@
       <form class="modal-content" id="app-form" novalidate data-form="application">
         <div class="modal-header">
           <div>
-            <p class="eyebrow mb-0" id="appModalEyebrow">New entry</p>
-            <h2 class="modal-title h4" id="appModalTitle">Add Job Application</h2>
+            <p class="eyebrow mb-0" id="appModalEyebrow">New application</p>
+            <h2 class="modal-title h5" id="appModalTitle">Add application</h2>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="alert alert-danger form-summary d-none" role="alert" id="form-summary"></div>
-          <p class="small text-muted mb-3">Fields marked <span class="req">*</span> are required. Everything else is optional — you can add it later.</p>
+          <p class="small text-muted mb-3">Fields marked <span class="req">*</span> are required. You can fill in the rest later.</p>
 
           <fieldset class="form-section">
             <legend><i class="bi bi-briefcase" aria-hidden="true"></i> Job</legend>
@@ -225,9 +206,9 @@
           </fieldset>
         </div>
         <div class="modal-footer">
-          <span class="me-auto small text-muted d-none d-sm-inline"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to save</span>
+          <span class="me-auto small text-muted d-none d-sm-inline"><kbd>Ctrl</kbd> <kbd>Enter</kbd> to save</span>
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="app-save"><i class="bi bi-floppy" aria-hidden="true"></i> Save Application</button>
+          <button type="submit" class="btn btn-primary" id="app-save">Save application</button>
         </div>
       </form>
     </div>
@@ -255,7 +236,7 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width:460px">
       <form class="modal-content" data-form="followup" novalidate>
         <div class="modal-header">
-          <div><p class="eyebrow mb-0" id="followEyebrow">Company</p><h2 class="modal-title h5" id="followTitle">Schedule Follow-up</h2></div>
+          <div><p class="eyebrow mb-0" id="followEyebrow">Company</p><h2 class="modal-title h5" id="followTitle">Schedule follow-up</h2></div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -274,7 +255,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary"><i class="bi bi-calendar-check" aria-hidden="true"></i> Schedule Follow-up</button>
+          <button type="submit" class="btn btn-primary">Schedule follow-up</button>
         </div>
       </form>
     </div>
@@ -283,12 +264,12 @@
   <!-- Level up -->
   <div class="modal fade" id="levelModal" tabindex="-1" aria-labelledby="levelTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
-      <div class="modal-content level-up text-center">
+      <div class="modal-content text-center">
         <div class="modal-body p-4">
-          <p class="eyebrow mb-1">Level up</p>
+          <p class="eyebrow mb-1">New level</p>
           <div class="level-burst"><span class="mono" id="levelNum">2</span></div>
           <h2 class="h4 mt-3" id="levelTitle">You reached level 2</h2>
-          <p class="text-muted mb-3" id="levelRank">New rank unlocked.</p>
+          <p class="text-muted mb-3" id="levelRank">New rank reached.</p>
           <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Continue</button>
         </div>
       </div>
@@ -300,7 +281,7 @@
     <div class="modal-dialog palette-dialog">
       <div class="modal-content palette">
         <div class="palette-search">
-          <i class="bi bi-command" aria-hidden="true"></i>
+          <i class="bi bi-search" aria-hidden="true"></i>
           <input id="palette-input" class="form-control" placeholder="Type a command or search applications…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-label="Command">
           <kbd>Esc</kbd>
         </div>
@@ -314,7 +295,7 @@
   <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
       <div class="modal-content">
-        <div class="modal-header"><h2 class="modal-title h5" id="shortcutsTitle"><i class="bi bi-keyboard" aria-hidden="true"></i> Keyboard shortcuts</h2>
+        <div class="modal-header"><h2 class="modal-title h5" id="shortcutsTitle">Keyboard shortcuts</h2>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
         <div class="modal-body" id="shortcuts-body"></div>
       </div>
@@ -322,23 +303,9 @@
   </div>
 
   <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
-  <div id="fx-layer" aria-hidden="true"></div>
-  <canvas id="fx-canvas" aria-hidden="true"></canvas>
-  <div id="wipe" aria-hidden="true">
-    <span class="wipe-bar"></span><span class="wipe-bar"></span><span class="wipe-bar"></span>
-    <span class="wipe-label mono" id="wipe-label"></span>
-  </div>
-  <div id="cursor" aria-hidden="true"><span class="cur-ring"><span class="cur-label"></span></span><span class="cur-dot"></span></div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- GSAP 3.13 (free for all uses, plugins included) -->
+  <!-- GSAP core: drives the particle scene's morphs and bursts only -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/applications.js"></script>
   <script src="js/form-validation.js"></script>
@@ -350,9 +317,12 @@
   <script src="js/io.js"></script>
   <script src="js/fx.js"></script>
   <script src="js/motion.js"></script>
-  <script src="js/logo.js"></script>
   <script src="js/background.js"></script>
-  <script src="js/experience.js"></script>
+  <script src="js/auth/auth-validation.js"></script>
+  <script src="js/auth/auth-service.js"></script>
+  <script src="js/auth/preview-adapter.js"></script>
+  <script src="js/auth/auth-config.js"></script>
+  <script src="js/auth/auth-ui.js"></script>
   <script src="js/views.js"></script>
   <script src="js/app.js"></script>
 </body>

@@ -314,7 +314,7 @@
     "followUpDate": "",
     "followUpNote": "",
     "followUpCompleted": false,
-    "notes": "Withdrew — role required relocation.",
+    "notes": "Withdrew: role required relocation.",
     "statusHistory": [
       {
         "status": "Applied",

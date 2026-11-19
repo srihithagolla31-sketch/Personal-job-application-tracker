@@ -1,5 +1,5 @@
 /**
- * applications.js — the application data model and pure CRUD functions.
+ * applications.js: the application data model and pure CRUD functions.
  * Every function returns a NEW array; nothing here touches the DOM or storage.
  */
 (function (JT) {
@@ -15,7 +15,7 @@
   const PRIORITIES = ['High', 'Medium', 'Low'];
 
   const STATUS_META = {
-    Interested: { tone: 'interested', icon: 'bi-bookmark-star', hint: 'Saved — not applied yet' },
+    Interested: { tone: 'interested', icon: 'bi-bookmark-star', hint: 'Saved, not applied yet' },
     Applied: { tone: 'applied', icon: 'bi-send', hint: 'Application submitted' },
     Assessment: { tone: 'assessment', icon: 'bi-code-square', hint: 'Test or assignment stage' },
     Interview: { tone: 'interview', icon: 'bi-people', hint: 'Interviewing' },
@@ -302,7 +302,7 @@
         id: 'APP-1008', company: 'Northwind Data', jobTitle: 'Business Analyst', jobType: 'Full-time',
         location: 'Mumbai', priority: 'Low', applied: -40,
         history: [['Applied', -40, 10], ['Withdrawn', -20, 13]],
-        notes: 'Withdrew — role required relocation.',
+        notes: 'Withdrew: role required relocation.',
       },
       {
         id: 'APP-1009', company: 'Cobalt Robotics', jobTitle: 'Embedded Systems Intern', jobType: 'Internship',
