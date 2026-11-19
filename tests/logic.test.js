@@ -1,5 +1,5 @@
 /**
- * Unit tests for the pure logic modules — run with:  npm test
+ * Unit tests for the pure logic modules. Run with:  npm test
  * (uses Node's built-in test runner, no dependencies).
  * Test IDs map to PRD §17.3 where applicable.
  */

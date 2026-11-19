@@ -1,5 +1,5 @@
 /**
- * form-validation.js — field-level validation shared by the form UI,
+ * form-validation.js: field-level validation shared by the form UI,
  * createApplication/updateApplication and CSV/JSON import.
  * Returns a map of { fieldName: friendlyMessage }; empty map = valid.
  */
@@ -15,7 +15,7 @@
     jobTitle: 'Please enter the job title.',
     applicationDate: 'Please choose the application date.',
     badDate: 'Use a valid date.',
-    farFuture: 'That date is more than a year away — please double-check it.',
+    farFuture: 'That date is more than a year away. Please double-check it.',
     status: 'Choose one of the listed statuses.',
     jobUrl: 'Enter a full link starting with http:// or https://',
     recruiterEmail: 'Enter a valid email, like name@company.com',

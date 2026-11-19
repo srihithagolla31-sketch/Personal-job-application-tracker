@@ -1,5 +1,5 @@
 /**
- * filters.js — search, filter and sort (PRD §6.1-F). Pure functions.
+ * filters.js: search, filter and sort (PRD §6.1-F). Pure functions.
  */
 (function (JT) {
   'use strict';

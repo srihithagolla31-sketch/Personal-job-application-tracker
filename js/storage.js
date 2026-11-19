@@ -1,5 +1,5 @@
 /**
- * storage.js — the only module that touches localStorage.
+ * storage.js: the only module that touches localStorage.
  * Every read is validated and every write is wrapped so a full or blocked
  * storage never crashes the app (PRD §10.5).
  */

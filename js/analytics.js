@@ -1,5 +1,5 @@
 /**
- * analytics.js — every dashboard number is derived from the records here.
+ * analytics.js: every dashboard number is derived from the records here.
  * Nothing in this file is ever written to storage (PRD §10.3).
  */
 (function (JT) {

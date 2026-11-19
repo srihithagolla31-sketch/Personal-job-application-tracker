@@ -1,5 +1,5 @@
 /**
- * follow-ups.js — follow-up state rules (PRD §10.6).
+ * follow-ups.js: follow-up state rules (PRD §10.6).
  *  upcoming  : date >= today and not completed
  *  overdue   : date <  today and not completed
  *  completed : explicitly marked complete by the student

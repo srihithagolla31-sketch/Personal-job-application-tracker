@@ -1,5 +1,5 @@
 /**
- * app.js — controller: routing, rendering, events, modals, game feedback.
+ * app.js: controller: routing, rendering, events, modals, game feedback.
  * Data flows one way: action → pure function (applications/follow-ups) →
  * commit() → storage → render(). Every metric is re-derived on render.
  */
@@ -25,6 +25,8 @@
     editingId: null,
     pendingFocus: null,
     booting: true,
+    signingOut: false,
+    pendingLoadInfo: null,
     palette: { items: [], index: 0 },
   };
   const modals = {};
@@ -94,7 +96,7 @@
 
   const getPlayer = () => JT.game.getPlayer(state.apps, today());
 
-  function commit(nextApps, { message, tone = 'success', anchor, action, celebrateOffer = false, flash, pulse } = {}) {
+  function commit(nextApps, { message, tone = 'success', action, celebrateOffer = false, flash } = {}) {
     const before = getPlayer();
     state.apps = nextApps;
     const saved = S.saveApplications(nextApps);
@@ -103,26 +105,15 @@
     }
     const after = getPlayer();
     const gained = after.xp - before.xp;
-    if (message) toast(message, tone, { action });
-    const origin = anchor && anchor.isConnected ? anchor : $('#hud');
-    const originRect = origin.getBoundingClientRect();
-    if (gained > 0) {
-      FX.floatText(`+${gained} XP`, origin);
-      FX.sound('xp');
+    if (message) {
+      const xpNote = gained > 0 ? ` <span class="xp-hint text-muted">+${gained} XP</span>` : '';
+      toast(`${esc(message)}${xpNote}`, tone, { action, html: true });
     }
-    if (celebrateOffer) { FX.confetti(); FX.sound('offer'); JT.world.quake(); }
+    if (gained > 0) FX.sound('xp');
+    if (celebrateOffer) { FX.sound('offer'); JT.world.quake(); }
     render();
+    if (gained > 0) JT.world.pulseAt($('#hud'), { amp: 0.14 });
     if (flash) document.querySelectorAll(`[data-flip$="-${CSS.escape(flash)}"]`).forEach((el) => JT.motion.flash(el));
-    if (pulse) { const p = $(pulse); if (p) JT.motion.pulse(p); }
-    if (gained > 0) {
-      // Orbs start where the action happened (the anchor may have been re-rendered).
-      const ghost = document.createElement('span');
-      ghost.style.cssText = `position:fixed;left:${originRect.left}px;top:${originRect.top}px;width:${originRect.width}px;height:${originRect.height}px;pointer-events:none`;
-      document.body.appendChild(ghost);
-      JT.world.pulse(originRect.left + originRect.width / 2, originRect.top + originRect.height / 2, { amp: 0.2 });
-      JT.motion.orbs(ghost, $('#hud'), { onArrive: () => { bumpHud(); JT.world.pulseAt($('#hud'), { amp: 0.14, life: 1.2 }); } });
-      ghost.remove();
-    }
     checkProgress(after);
   }
 
@@ -134,7 +125,7 @@
       state.game.unlocked[a.id] = new Date().toISOString();
       changed = true;
       setTimeout(() => {
-        toast(`<b>Achievement unlocked · ${esc(a.title)}</b><span class="d-block small opacity-75">${esc(a.desc)}</span>`, 'achieve', { html: true, timeout: 5200 });
+        toast(`<b>Achievement unlocked: ${esc(a.title)}</b><span class="d-block small opacity-75">${esc(a.desc)}</span>`, 'achieve', { html: true, timeout: 5200 });
         FX.sound('achieve');
       }, 700 + i * 900);
     });
@@ -163,16 +154,8 @@
     $('#levelTitle').textContent = `You reached level ${player.level}`;
     $('#levelRank').textContent = `Rank: ${player.rank}. ${player.next - player.xp} XP to level ${player.level + 1}.`;
     modals.level.show();
-    FX.confetti();
     JT.world.quake();
     FX.sound('level');
-  }
-
-  function bumpHud() {
-    const hud = $('#hud');
-    hud.classList.remove('bump');
-    void hud.offsetWidth;
-    hud.classList.add('bump');
   }
 
   /* ======================= Routing & rendering ======================= */
@@ -184,8 +167,26 @@
     return { name: parts[0] || 'dashboard', param: parts[1] ? decodeURIComponent(parts[1]) : null, query: new URLSearchParams(qs || '') };
   }
 
+  /** Redirects that keep protected screens behind sign-in. Returns true if it navigated away. */
+  function guardRoute(r) {
+    const authRoute = JT.authUI.isAuthRoute(r.name);
+    const signedIn = JT.auth.isSignedIn();
+    if (!signedIn && !authRoute) {
+      const here = window.location.hash && window.location.hash !== '#' ? window.location.hash : '#/dashboard';
+      const next = JT.authValidation.safeNext(here);
+      window.location.replace(next === '#/dashboard' ? '#/login' : `#/login?next=${encodeURIComponent(next)}`);
+      return true;
+    }
+    if (signedIn && authRoute) {
+      window.location.replace(JT.authValidation.safeNext(r.query.get('next') || ''));
+      return true;
+    }
+    return false;
+  }
+
   function onRoute() {
     const r = parseHash();
+    if (guardRoute(r)) return;
     const changed = r.name !== state.route.name || r.param !== state.route.param;
     state.route = r;
     if (r.name === 'applications' && [...r.query.keys()].length) {
@@ -209,7 +210,11 @@
   function buildCtx() {
     const t = today();
     const player = getPlayer();
+    const user = JT.auth.getUser();
+    const customName = state.settings.playerName !== S.DEFAULT_SETTINGS.playerName;
+    const firstName = user && user.name ? user.name.trim().split(/\s+/)[0] : '';
     return {
+      displayName: customName || !firstName ? state.settings.playerName : firstName,
       apps: state.apps,
       today: t,
       settings: state.settings,
@@ -232,7 +237,29 @@
     return null;
   }
 
+  function renderAuthScreen() {
+    const main = $('#main');
+    document.body.classList.add('layout-auth');
+    main.innerHTML = JT.authUI.render(state.route.name, state.route.query);
+    JT.world.setScene(state.route.name);
+    document.title = `${JT.authUI.titleFor(state.route.name)} · JobTrack`;
+    window.scrollTo(0, 0);
+    document.querySelectorAll('.modal.show').forEach((m) => bootstrap.Modal.getInstance(m)?.hide());
+    JT.authUI.afterRender(main);
+  }
+
+  function updateUserMenu() {
+    const user = JT.auth.getUser();
+    if (!user) return;
+    const label = user.name || user.email;
+    $('#user-menu-btn').textContent = U.initials(label);
+    $('#user-menu-btn').setAttribute('aria-label', `Account menu for ${label}`);
+    $('#user-menu-head').innerHTML = `<b>${esc(user.name || 'Signed in')}</b><span>${esc(user.email)}</span>`;
+  }
+
   function render({ routeChanged = false } = {}) {
+    if (JT.authUI.isAuthRoute(state.route.name)) { renderAuthScreen(); return; }
+    document.body.classList.remove('layout-auth');
     const main = $('#main');
     const snap = routeChanged ? null : focusSnapshot();
     let ctx;
@@ -267,7 +294,15 @@
     }
 
     document.title = `${title} · JobTrack`;
-    if (ctx) { updateNav(ctx); $('#hud').innerHTML = V.hud(ctx.player); JT.experience.ticker(ctx.player); }
+    if (state.pendingLoadInfo) {
+      // Storage notices and level checks wait until the user is inside the app.
+      const info = state.pendingLoadInfo;
+      state.pendingLoadInfo = null;
+      showLoadNotice(info);
+      checkProgress(getPlayer());
+    }
+    if (ctx) { updateNav(ctx); $('#hud').innerHTML = V.hud(ctx.player); }
+    updateUserMenu();
     afterRender(main, routeChanged);
 
     if (routeChanged) {
@@ -278,7 +313,7 @@
       const target = state.pendingFocus ? document.getElementById(state.pendingFocus) : null;
       state.pendingFocus = null;
       (target || main).focus({ preventScroll: true });
-      if (!state.booting) JT.motion.pageEnter(main);
+      JT.motion.pageEnter(main);
     } else if (snap) {
       const el = $(snap.selector);
       if (el) {
@@ -297,13 +332,9 @@
     $('#results-count').innerHTML = state.apps.length ? V.resultsCount(ctx) : '';
   }
 
-  function afterRender(root, animate) {
-    root.querySelectorAll('[data-count]').forEach((el) => {
-      if (animate) FX.countUp(el, el.dataset.count);
-      else el.textContent = `${el.dataset.count}${el.dataset.suffix || ''}`;
-    });
-    // Bars and rings tween from their previous value (or from zero on a fresh screen).
-    JT.motion.bars(root, { fromZero: animate });
+  function afterRender(root) {
+    root.querySelectorAll('[data-count]').forEach((el) => { el.textContent = `${el.dataset.count}${el.dataset.suffix || ''}`; });
+    JT.motion.bars(root);
     const step = root.querySelector('.step.current');
     if (step) step.parentElement.scrollLeft = Math.max(0, step.offsetLeft - step.parentElement.clientWidth / 2 + step.offsetWidth / 2);
   }
@@ -319,10 +350,9 @@
     badge.hidden = !ctx.stats.overdue;
     badge.textContent = ctx.stats.overdue;
     badge.setAttribute('aria-label', `${ctx.stats.overdue} overdue`);
-    JT.motion.navInk();
   }
 
-  /** Single "Cosmos" theme; only the motion preference varies. */
+  /** Single Cosmos theme; only the motion preference varies. */
   function applyTheme() {
     document.documentElement.setAttribute('data-motion', state.settings.reduceMotion ? 'reduced' : 'full');
   }
@@ -389,8 +419,8 @@
       const el = form.elements[name];
       if (el) el.value = value ?? '';
     });
-    $('#appModalTitle').textContent = app ? 'Edit Application' : 'Add Job Application';
-    $('#appModalEyebrow').textContent = app ? app.company : `New entry · +${JT.game.XP_RULES.created} XP`;
+    $('#appModalTitle').textContent = app ? 'Edit application' : 'Add application';
+    $('#appModalEyebrow').textContent = app ? app.company : 'New application';
     $('#company-list').innerHTML = [...new Set(state.apps.map((a) => a.company))].map((c) => `<option value="${esc(c)}"></option>`).join('');
     $('#appModal').addEventListener('shown.bs.modal', () => {
       const target = (focusField && form.elements[focusField]) || form.elements.company;
@@ -420,7 +450,6 @@
       modals.app.hide();
       commit(next, {
         message: 'Application saved successfully. You can update its status or schedule a follow-up anytime.',
-        anchor: $('#app-save'),
         celebrateOffer: becameOffer,
         flash: prev ? prev.id : created.id,
       });
@@ -439,12 +468,10 @@
     try {
       const isOffer = status === 'Offer';
       commit(A.updateApplicationStatus(state.apps, id, status), {
-        message: isOffer ? `Offer unlocked at ${app.company}! Huge win.` : `${app.company} moved to ${status}.`,
+        message: isOffer ? `Offer recorded for ${app.company}. Congratulations.` : `${app.company} moved to ${status}.`,
         tone: isOffer ? 'achieve' : 'success',
-        anchor,
         celebrateOffer: isOffer,
         flash: id,
-        pulse: '.step.current .step-dot',
       });
     } catch (err) {
       toast(err.message, 'danger');
@@ -461,7 +488,7 @@
     });
     if (!ok) return;
     const onDetails = state.route.name === 'app';
-    commit(A.deleteApplication(state.apps, id), { message: `Deleted ${app.company} — ${app.jobTitle}.`, tone: 'info' });
+    commit(A.deleteApplication(state.apps, id), { message: `Deleted ${app.company}: ${app.jobTitle}.`, tone: 'info' });
     if (onDetails) window.location.hash = '#/applications';
   }
 
@@ -471,7 +498,6 @@
     try {
       commit(FU.completeFollowUp(state.apps, id), {
         message: `Follow-up with ${app.company} marked complete.`,
-        anchor,
         action: { label: 'Schedule next', run: () => openFollowModal(id) },
         flash: id,
       });
@@ -484,7 +510,7 @@
     const app = A.getById(state.apps, id);
     if (!app) return;
     const date = U.addDays(today(), days);
-    commit(FU.scheduleFollowUp(state.apps, id, date), { message: `${app.company} follow-up moved to ${U.formatDate(date)}.`, tone: 'info', anchor, flash: id });
+    commit(FU.scheduleFollowUp(state.apps, id, date), { message: `${app.company} follow-up moved to ${U.formatDate(date)}.`, tone: 'info', flash: id });
   }
 
   function openFollowModal(id) {
@@ -539,7 +565,7 @@
     const input = form.elements.note;
     try {
       const next = A.addNote(state.apps, form.dataset.id, input.value);
-      commit(next, { message: 'Note added.', anchor: form.querySelector('button') });
+      commit(next, { message: 'Note added.' });
       const again = $('#note-input');
       if (again) again.focus();
     } catch (err) {
@@ -580,7 +606,7 @@
         const trimmed = text.trim();
         const isJson = /\.json$/i.test(file.name) || trimmed.startsWith('{') || trimmed.startsWith('[');
         const { records, invalid } = isJson ? JT.io.fromJSON(text) : JT.io.fromCSV(text);
-        if (!records.length) throw new Error(`No valid applications were found${invalid ? ` — ${invalid} row(s) were invalid` : ''}.`);
+        if (!records.length) throw new Error(`No valid applications were found${invalid ? `. ${invalid} row(s) were invalid` : ''}.`);
         const ok = await confirmDialog({
           title: `Import ${U.plural(records.length, 'application')}?`,
           message: `Applications with matching IDs will be updated and new ones added.${invalid ? ` ${invalid} invalid row(s) will be skipped.` : ''}`,
@@ -598,9 +624,9 @@
 
   async function resetDemo() {
     const ok = await confirmDialog({
-      title: 'Reset to demo data?',
+      title: 'Load sample data?',
       message: 'This replaces all your applications with the sample dataset and resets trophies. Export a backup first if you want to keep your data.',
-      confirmLabel: 'Reset demo data', tone: 'warning', icon: 'bi-arrow-counterclockwise',
+      confirmLabel: 'Load sample data', tone: 'warning', icon: 'bi-arrow-counterclockwise',
     });
     if (!ok) return;
     const { apps, result } = S.resetToSample();
@@ -608,7 +634,7 @@
     baselineGame();
     $('#banner').innerHTML = '';
     if (!result.ok) toast("We couldn't save the demo data in this browser.", 'danger');
-    else toast('Demo data loaded. Explore away!', 'info');
+    else toast('Sample data loaded.', 'info');
     render();
   }
 
@@ -623,7 +649,7 @@
     state.apps = [];
     baselineGame();
     $('#banner').innerHTML = '';
-    toast(r.ok ? 'All applications deleted. Fresh start!' : "We couldn't save your changes in this browser.", r.ok ? 'info' : 'danger');
+    toast(r.ok ? 'All applications deleted.' : "We couldn't save your changes in this browser.", r.ok ? 'info' : 'danger');
     render();
   }
 
@@ -639,6 +665,15 @@
     state.settings.listView = state.settings.listView === 'board' ? 'table' : 'board';
     saveSettings();
     render();
+  }
+
+  async function signOut() {
+    document.querySelectorAll('.modal.show').forEach((m) => bootstrap.Modal.getInstance(m)?.hide());
+    state.signingOut = true;
+    const res = await JT.auth.signOut();
+    state.signingOut = false;
+    if (!res.ok) toast('You were signed out on this device, but the server could not confirm it.', 'warning');
+    window.location.hash = '#/login?notice=signed-out';
   }
 
   function showShortcuts() {
@@ -666,7 +701,7 @@
       case 'delete-note': deleteNote(id, el.dataset.note); break;
       case 'clear-contact': clearContact(id); break;
       case 'copy':
-        if (navigator.clipboard) navigator.clipboard.writeText(el.dataset.text).then(() => toast('Copied to clipboard.', 'info'), () => toast('Copy failed — select the text instead.', 'warning'));
+        if (navigator.clipboard) navigator.clipboard.writeText(el.dataset.text).then(() => toast('Copied to clipboard.', 'info'), () => toast('Copy failed. Select the text and copy it instead.', 'warning'));
         break;
       case 'set-view':
         state.settings.listView = el.dataset.view === 'board' ? 'board' : 'table';
@@ -687,6 +722,7 @@
       case 'reset-demo': resetDemo(); break;
       case 'clear-all': clearAll(); break;
       case 'open-palette': openPalette(); break;
+      case 'sign-out': signOut(); break;
       case 'show-shortcuts': showShortcuts(); break;
       case 'scroll-overview': { const o = document.getElementById('overview'); if (o) o.scrollIntoView({ behavior: FX.motionOK() ? 'smooth' : 'auto', block: 'start' }); break; }
       case 'cal-prev':
@@ -732,11 +768,12 @@
       { label: `${state.settings.sound ? 'Mute' : 'Enable'} sound effects`, icon: state.settings.sound ? 'bi-volume-mute' : 'bi-volume-up', run: toggleSound },
       { label: 'Toggle list / board view', icon: 'bi-kanban', hint: 'B', run: () => { if (state.route.name !== 'applications') window.location.hash = '#/applications'; toggleView(); } },
       { label: 'Show keyboard shortcuts', icon: 'bi-keyboard', hint: '?', run: showShortcuts },
+      { label: 'Sign out', icon: 'bi-box-arrow-right', run: signOut },
     ];
     const nav = [['Dashboard', 'dashboard', 'bi-speedometer2'], ['Applications', 'applications', 'bi-collection'], ['Follow-ups', 'followups', 'bi-bell'],
       ['Contacts', 'contacts', 'bi-person-lines-fill'], ['Trophies', 'trophies', 'bi-award'], ['Settings', 'settings', 'bi-gear']]
       .map(([label, r, icon]) => ({ label: `Go to ${label}`, icon, hint: 'Page', run: go(r) }));
-    const apps = state.apps.map((a) => ({ label: `${a.company} — ${a.jobTitle}`, icon: 'bi-briefcase', hint: a.status, run: go(`app/${encodeURIComponent(a.id)}`) }));
+    const apps = state.apps.map((a) => ({ label: `${a.company}: ${a.jobTitle}`, icon: 'bi-briefcase', hint: a.status, run: go(`app/${encodeURIComponent(a.id)}`) }));
     const q = query.trim().toLowerCase();
     if (!q) return [...actions.slice(0, 4), ...nav, ...apps.slice(0, 4)];
     return [...actions, ...nav, ...apps]
@@ -760,7 +797,7 @@
   }
 
   function openPalette() {
-    if (document.querySelector('.modal.show')) return;
+    if (document.querySelector('.modal.show') || JT.authUI.isAuthRoute(state.route.name)) return;
     const input = $('#palette-input');
     input.value = '';
     state.palette = { items: paletteCommands(''), index: 0 };
@@ -848,7 +885,7 @@
         case 'followup': saveFollowUp(form); break;
         case 'profile': {
           const name = form.elements.playerName.value.trim().slice(0, 40);
-          state.settings.playerName = name || 'Player One';
+          state.settings.playerName = name || S.DEFAULT_SETTINGS.playerName;
           saveSettings();
           toast('Display name saved.');
           render();
@@ -895,6 +932,7 @@
     let gPending = false;
     let gTimer = null;
     document.addEventListener('keydown', (e) => {
+      if (JT.authUI.isAuthRoute(state.route.name)) return;
       const t = e.target;
       const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable;
       const key = e.key;
@@ -931,21 +969,15 @@
       }
     });
 
-    window.addEventListener('hashchange', () => {
-      const next = parseHash();
-      const sameScreen = next.name === state.route.name && next.param === state.route.param;
-      if (state.booting || sameScreen) onRoute();
-      else JT.experience.wipe(next.name, onRoute);
-    });
+    window.addEventListener('hashchange', onRoute);
 
     // Re-render when the day rolls over so overdue states stay correct.
     let lastDay = today();
-    setInterval(() => {
-      if (today() !== lastDay) { lastDay = today(); render(); }
-    }, 60000);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && today() !== lastDay) { lastDay = today(); render(); }
-    });
+    const rerenderIfNewDay = () => {
+      if (today() !== lastDay && !JT.authUI.isAuthRoute(state.route.name)) { lastDay = today(); render(); }
+    };
+    setInterval(rerenderIfNewDay, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) rerenderIfNewDay(); });
   }
 
   /* ======================= Boot ======================= */
@@ -956,18 +988,18 @@
       banner.innerHTML = `<div class="alert alert-warning d-flex gap-3 align-items-start mt-3 mb-0" role="alert">
         <i class="bi bi-exclamation-triangle-fill fs-4" aria-hidden="true"></i>
         <div class="flex-grow-1"><b>We couldn’t read your saved applications.</b><div class="small">The saved data looks damaged. A copy was kept in this browser as <code>${S.KEYS.corrupt}</code>. You can start fresh or load demo data.</div></div>
-        <button class="btn btn-sm btn-outline-secondary" data-action="reset-demo">Load demo data</button></div>`;
+        <button class="btn btn-sm btn-outline-secondary" data-action="reset-demo">Load sample data</button></div>`;
     } else if (info.status === 'unavailable') {
       banner.innerHTML = `<div class="alert alert-warning mt-3 mb-0 small" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-        Browser storage is unavailable (private browsing or blocked site data). You’re seeing demo data, and changes won’t be kept after a refresh.</div>`;
+        Browser storage is unavailable (private browsing or blocked site data). You’re seeing sample data, and changes won’t be kept after a refresh.</div>`;
     } else if (info.status === 'partial') {
       toast(`${U.plural(info.invalid, 'saved record')} couldn’t be read and ${info.invalid === 1 ? 'was' : 'were'} skipped. The rest loaded normally.`, 'warning', { timeout: 8000 });
     } else if (info.status === 'seeded') {
-      toast('Demo data loaded so you can explore. Reset or clear it anytime in Settings.', 'info', { timeout: 6000 });
+      toast('Sample data loaded so you can explore. You can clear it anytime in Settings.', 'info', { timeout: 6000 });
     }
   }
 
-  function boot() {
+  async function boot() {
     state.settings = S.loadSettings();
     applyTheme();
     FX.configure({ reduceMotion: state.settings.reduceMotion, sound: state.settings.sound });
@@ -983,34 +1015,33 @@
     modals.shortcuts = new bootstrap.Modal('#shortcutsModal');
     buildStatusPicker();
     bindEvents();
-    JT.motion.init();
     JT.world.init({ enabled: state.settings.liveBg });
-    JT.experience.init();
-    document.addEventListener('show.bs.modal', (e) => JT.motion.modalIn(e.target));
+    JT.authUI.init({
+      toast,
+      onSignedUp(user) {
+        // Use the new account's first name as the display name if it was never customised.
+        const first = String(user.name || '').trim().split(/\s+/)[0];
+        if (first && state.settings.playerName === S.DEFAULT_SETTINGS.playerName) {
+          state.settings.playerName = first.slice(0, 40);
+          saveSettings();
+        }
+      },
+    });
 
     const savedGame = S.loadGame();
     if (savedGame) state.game = savedGame; else baselineGame();
 
-    onRoute();
-    showLoadNotice(info);
-    checkProgress(getPlayer());
+    await JT.auth.init();
+    // If the provider ends the session (expiry, sign-out in another tab), leave protected screens.
+    JT.auth.onChange((session) => {
+      const onAuthScreen = JT.authUI.isAuthRoute(state.route.name);
+      if (!session && !state.signingOut && !onAuthScreen) window.location.hash = '#/login?notice=session-ended';
+      else if (session && onAuthScreen) onRoute();
+    });
 
-    // Boot splash: the logo draws itself, then the header logo + screen intro play.
-    const bootEl = $('#boot');
-    const brand = JT.logo.init();
-    const bootLen = JT.logo.intro(bootEl.querySelector('.logo-svg'), { wordmark: bootEl.querySelector('.wordmark') });
-    JT.motion.scramble(bootEl.querySelector('.boot-label'), { delay: 300, duration: 900 });
-    const hold = FX.motionOK() ? Math.min(bootLen, 1550) : 0;
-    setTimeout(() => {
-      bootEl.classList.add('done');
-      state.booting = false;
-      JT.logo.intro(brand.mark, { delay: 120, wordmark: brand.wordmark });
-      const main = $('#main');
-      main.querySelectorAll('[data-count]').forEach((el) => FX.countUp(el, el.dataset.count));
-      JT.motion.bars(main, { fromZero: true });
-      JT.motion.pageEnter(main);
-      setTimeout(() => bootEl.remove(), 450);
-    }, hold);
+    state.booting = false;
+    state.pendingLoadInfo = info;
+    onRoute();
   }
 
   // Expose a tiny debug surface for developers poking around in DevTools.

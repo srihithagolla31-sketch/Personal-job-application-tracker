@@ -1,5 +1,5 @@
 /**
- * io.js — CSV / JSON export and validated import (PRD §6.2).
+ * io.js: CSV / JSON export and validated import (PRD §6.2).
  */
 (function (JT) {
   'use strict';

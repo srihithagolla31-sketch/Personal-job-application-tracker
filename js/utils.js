@@ -1,5 +1,5 @@
 /**
- * utils.js — date helpers, formatting, validation primitives, ids.
+ * utils.js: date helpers, formatting, validation primitives, ids.
  * All dates for applications/follow-ups are local calendar dates stored as
  * "YYYY-MM-DD" strings, so overdue checks never drift across timezones.
  */
@@ -60,7 +60,7 @@
 
   function formatDate(iso, { short = false } = {}) {
     const d = parseISODate(iso);
-    if (!d) return '—';
+    if (!d) return 'Not set';
     const base = `${d.getDate()} ${MONTHS[d.getMonth()]}`;
     if (short && d.getFullYear() === new Date().getFullYear()) return base;
     return `${base} ${d.getFullYear()}`;
@@ -68,7 +68,7 @@
 
   function formatDateTime(ts) {
     const d = new Date(ts);
-    if (Number.isNaN(d.getTime())) return '—';
+    if (Number.isNaN(d.getTime())) return 'Not set';
     return `${formatDate(toISODate(d))}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
@@ -145,7 +145,7 @@
     return (parts.slice(0, 2).map((w) => w[0]).join('') || '?').toUpperCase();
   }
 
-  /** Stable index 0..n-1 from a string — used to pick a monogram tone. */
+  /** Stable index 0..n-1 from a string, used to pick a monogram tone. */
   function hashIndex(str, n) {
     let h = 0;
     for (const ch of String(str)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
