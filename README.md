@@ -9,6 +9,8 @@ Motion is powered by **GSAP 3.13** (CDN). There is no backend, no framework and 
 
 ---
 
+**Live demo:** https://srihithagolla31-sketch.github.io/Personal-job-application-tracker/
+
 ## Run it
 
 ```bash
@@ -16,7 +18,8 @@ npm start          # zero-dependency static server → http://localhost:5944
 npm test           # 17 unit tests (Node's built-in test runner)
 ```
 
-You can also serve the folder with any static server (`python3 -m http.server`), or deploy it as-is to GitHub Pages or Vercel.
+You can also serve the folder with any static server (`python3 -m http.server`).
+The live demo is hosted on **GitHub Pages**, served straight from the `main` branch root, so every push to `main` redeploys it automatically.
 Opening `index.html` directly from disk also works.
 
 ## Features
