@@ -1,0 +1,477 @@
+[
+  {
+    "id": "APP-1001",
+    "company": "Acme Technologies",
+    "jobTitle": "Software Development Intern",
+    "jobType": "Internship",
+    "location": "Bengaluru",
+    "priority": "High",
+    "jobUrl": "https://example.com/jobs/1001",
+    "salary": "₹40k / month stipend",
+    "applicationDate": "2026-10-12",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Applied",
+    "recruiter": {
+      "name": "Recruiter Example",
+      "email": "recruiter@example.com",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-22",
+    "followUpNote": "Ask whether the coding round has been scheduled.",
+    "followUpCompleted": false,
+    "notes": "Applied through the company careers page.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-12T05:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [
+      {
+        "id": "NOTE-APP-1001-0",
+        "text": "Referral requested from a senior on LinkedIn.",
+        "at": "2026-10-23T12:45:00.000Z"
+      }
+    ],
+    "createdAt": "2026-10-12T05:45:00.000Z",
+    "updatedAt": "2026-10-23T12:45:00.000Z"
+  },
+  {
+    "id": "APP-1002",
+    "company": "Nova Systems",
+    "jobTitle": "Frontend Developer Intern",
+    "jobType": "Internship",
+    "location": "Remote",
+    "priority": "High",
+    "jobUrl": "https://example.com/jobs/1002",
+    "salary": "₹35k / month",
+    "applicationDate": "2026-10-06",
+    "deadline": "",
+    "interviewDate": "2026-10-27",
+    "status": "Interview",
+    "recruiter": {
+      "name": "Meera Iyer",
+      "email": "meera.iyer@example.com",
+      "phone": "+91 98450 00000"
+    },
+    "followUpDate": "2026-10-25",
+    "followUpNote": "Confirm the panel interview slot.",
+    "followUpCompleted": false,
+    "notes": "Take-home was a React dashboard. Interview is with the platform team.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-06T03:45:00.000Z"
+      },
+      {
+        "status": "Assessment",
+        "at": "2026-10-11T09:45:00.000Z"
+      },
+      {
+        "status": "Interview",
+        "at": "2026-10-19T06:45:00.000Z"
+      }
+    ],
+    "followUpLog": [
+      {
+        "date": "2026-10-15",
+        "completedAt": "2026-10-15T12:00:00.000Z",
+        "note": "Thanked them for the assessment link."
+      }
+    ],
+    "notesLog": [
+      {
+        "id": "NOTE-APP-1002-0",
+        "text": "Revise React hooks + accessibility basics.",
+        "at": "2026-10-19T14:45:00.000Z"
+      }
+    ],
+    "createdAt": "2026-10-06T03:45:00.000Z",
+    "updatedAt": "2026-10-19T14:45:00.000Z"
+  },
+  {
+    "id": "APP-1003",
+    "company": "Blue Harbor Labs",
+    "jobTitle": "Data Analyst",
+    "jobType": "Full-time",
+    "location": "Hyderabad",
+    "priority": "Medium",
+    "jobUrl": "https://example.com/jobs/1003",
+    "salary": "₹8 LPA",
+    "applicationDate": "2026-10-15",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Applied",
+    "recruiter": {
+      "name": "Daniel Brooks",
+      "email": "d.brooks@example.com",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-28",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "SQL + Power BI heavy role.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-15T08:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-15T08:45:00.000Z",
+    "updatedAt": "2026-10-15T08:45:00.000Z"
+  },
+  {
+    "id": "APP-1004",
+    "company": "Pinecrest Software",
+    "jobTitle": "Junior Backend Engineer",
+    "jobType": "Full-time",
+    "location": "Pune",
+    "priority": "High",
+    "jobUrl": "https://example.com/jobs/1004",
+    "salary": "₹12 LPA",
+    "applicationDate": "2026-09-24",
+    "deadline": "2026-10-29",
+    "interviewDate": "",
+    "status": "Offer",
+    "recruiter": {
+      "name": "Arjun Rao",
+      "email": "arjun.rao@example.com",
+      "phone": "+91 90000 11111"
+    },
+    "followUpDate": "2026-10-20",
+    "followUpNote": "",
+    "followUpCompleted": true,
+    "notes": "Offer letter received. Reply by the deadline.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-09-24T04:45:00.000Z"
+      },
+      {
+        "status": "Assessment",
+        "at": "2026-09-30T10:45:00.000Z"
+      },
+      {
+        "status": "Interview",
+        "at": "2026-10-08T05:45:00.000Z"
+      },
+      {
+        "status": "Offer",
+        "at": "2026-10-21T11:45:00.000Z"
+      }
+    ],
+    "followUpLog": [
+      {
+        "date": "2026-10-04",
+        "completedAt": "2026-10-04T12:00:00.000Z",
+        "note": "Sent thank-you note after assessment."
+      },
+      {
+        "date": "2026-10-20",
+        "completedAt": "2026-10-20T12:00:00.000Z",
+        "note": "Asked about joining date."
+      }
+    ],
+    "notesLog": [
+      {
+        "id": "NOTE-APP-1004-0",
+        "text": "Compare offer with Nova before accepting.",
+        "at": "2026-10-21T13:45:00.000Z"
+      }
+    ],
+    "createdAt": "2026-09-24T04:45:00.000Z",
+    "updatedAt": "2026-10-21T13:45:00.000Z"
+  },
+  {
+    "id": "APP-1005",
+    "company": "Orbit Analytics",
+    "jobTitle": "ML Research Intern",
+    "jobType": "Internship",
+    "location": "Chennai",
+    "priority": "Medium",
+    "jobUrl": "https://example.com/jobs/1005",
+    "salary": "",
+    "applicationDate": "2026-09-29",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Rejected",
+    "recruiter": {
+      "name": "",
+      "email": "",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-16",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "Feedback: strengthen statistics fundamentals.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-09-29T04:45:00.000Z"
+      },
+      {
+        "status": "Rejected",
+        "at": "2026-10-14T03:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-09-29T04:45:00.000Z",
+    "updatedAt": "2026-10-14T03:45:00.000Z"
+  },
+  {
+    "id": "APP-1006",
+    "company": "Ironclad Security",
+    "jobTitle": "Security Analyst Intern",
+    "jobType": "Internship",
+    "location": "Remote",
+    "priority": "Low",
+    "jobUrl": "https://example.com/jobs/1006",
+    "salary": "",
+    "applicationDate": "2026-10-21",
+    "deadline": "2026-10-30",
+    "interviewDate": "",
+    "status": "Interested",
+    "recruiter": {
+      "name": "",
+      "email": "",
+      "phone": ""
+    },
+    "followUpDate": "",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "Needs a short cover letter. Deadline coming up.",
+    "statusHistory": [
+      {
+        "status": "Interested",
+        "at": "2026-10-21T15:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-21T15:45:00.000Z",
+    "updatedAt": "2026-10-21T15:45:00.000Z"
+  },
+  {
+    "id": "APP-1007",
+    "company": "Lumen Health Tech",
+    "jobTitle": "QA Automation Intern",
+    "jobType": "Internship",
+    "location": "Bengaluru",
+    "priority": "Medium",
+    "jobUrl": "https://example.com/jobs/1007",
+    "salary": "",
+    "applicationDate": "2026-10-09",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Assessment",
+    "recruiter": {
+      "name": "Sofia Lind",
+      "email": "sofia.lind@example.com",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-23",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "Selenium + Playwright assessment submitted.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-09T06:45:00.000Z"
+      },
+      {
+        "status": "Assessment",
+        "at": "2026-10-16T04:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-09T06:45:00.000Z",
+    "updatedAt": "2026-10-16T04:45:00.000Z"
+  },
+  {
+    "id": "APP-1008",
+    "company": "Northwind Data",
+    "jobTitle": "Business Analyst",
+    "jobType": "Full-time",
+    "location": "Mumbai",
+    "priority": "Low",
+    "jobUrl": "https://example.com/jobs/1008",
+    "salary": "",
+    "applicationDate": "2026-09-14",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Withdrawn",
+    "recruiter": {
+      "name": "",
+      "email": "",
+      "phone": ""
+    },
+    "followUpDate": "",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "Withdrew — role required relocation.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-09-14T04:45:00.000Z"
+      },
+      {
+        "status": "Withdrawn",
+        "at": "2026-10-04T07:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-09-14T04:45:00.000Z",
+    "updatedAt": "2026-10-04T07:45:00.000Z"
+  },
+  {
+    "id": "APP-1009",
+    "company": "Cobalt Robotics",
+    "jobTitle": "Embedded Systems Intern",
+    "jobType": "Internship",
+    "location": "Remote",
+    "priority": "Medium",
+    "jobUrl": "https://example.com/jobs/1009",
+    "salary": "",
+    "applicationDate": "2026-10-18",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Applied",
+    "recruiter": {
+      "name": "",
+      "email": "",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-24",
+    "followUpNote": "Check application portal status.",
+    "followUpCompleted": false,
+    "notes": "",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-18T10:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-18T10:45:00.000Z",
+    "updatedAt": "2026-10-18T10:45:00.000Z"
+  },
+  {
+    "id": "APP-1010",
+    "company": "Quantum Leaf",
+    "jobTitle": "UI Engineer",
+    "jobType": "Part-time",
+    "location": "Remote",
+    "priority": "Medium",
+    "jobUrl": "https://example.com/jobs/1010",
+    "salary": "",
+    "applicationDate": "2026-10-22",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Applied",
+    "recruiter": {
+      "name": "Kabir Shah",
+      "email": "kabir@example.com",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-31",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "",
+    "statusHistory": [
+      {
+        "status": "Interested",
+        "at": "2026-10-20T13:45:00.000Z"
+      },
+      {
+        "status": "Applied",
+        "at": "2026-10-22T05:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-20T13:45:00.000Z",
+    "updatedAt": "2026-10-22T05:45:00.000Z"
+  },
+  {
+    "id": "APP-1011",
+    "company": "Atlas Fintech",
+    "jobTitle": "Software Engineer Trainee",
+    "jobType": "Full-time",
+    "location": "Gurugram",
+    "priority": "High",
+    "jobUrl": "https://example.com/jobs/1011",
+    "salary": "",
+    "applicationDate": "2026-10-02",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Rejected",
+    "recruiter": {
+      "name": "",
+      "email": "",
+      "phone": ""
+    },
+    "followUpDate": "",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "Cleared aptitude, missed the DSA cutoff. Practice graphs.",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-02T04:45:00.000Z"
+      },
+      {
+        "status": "Assessment",
+        "at": "2026-10-07T08:45:00.000Z"
+      },
+      {
+        "status": "Rejected",
+        "at": "2026-10-13T12:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-02T04:45:00.000Z",
+    "updatedAt": "2026-10-13T12:45:00.000Z"
+  },
+  {
+    "id": "APP-1012",
+    "company": "Maple Cloud",
+    "jobTitle": "DevOps Intern",
+    "jobType": "Internship",
+    "location": "Remote",
+    "priority": "Medium",
+    "jobUrl": "https://example.com/jobs/1012",
+    "salary": "",
+    "applicationDate": "2026-10-24",
+    "deadline": "",
+    "interviewDate": "",
+    "status": "Applied",
+    "recruiter": {
+      "name": "",
+      "email": "",
+      "phone": ""
+    },
+    "followUpDate": "2026-10-29",
+    "followUpNote": "",
+    "followUpCompleted": false,
+    "notes": "",
+    "statusHistory": [
+      {
+        "status": "Applied",
+        "at": "2026-10-24T03:45:00.000Z"
+      }
+    ],
+    "followUpLog": [],
+    "notesLog": [],
+    "createdAt": "2026-10-24T03:45:00.000Z",
+    "updatedAt": "2026-10-24T03:45:00.000Z"
+  }
+]

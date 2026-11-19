@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en" data-theme="cosmos" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JobTrack — Personal Job Application Tracker</title>
+  <meta name="description" content="Track job and internship applications, follow-ups and recruiter contacts — with XP, levels, quests and trophies.">
+  <meta name="theme-color" content="#030409">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div id="boot" class="boot" role="status" aria-live="polite">
+    <div class="boot-inner">
+      <div class="boot-logo"><svg class="logo-svg" viewBox="0 0 40 40" width="88" height="88" aria-hidden="true" focusable="false">
+            <rect class="lg-badge" x="1" y="1" width="38" height="38" rx="11"/>
+            <path class="lg-base" pathLength="1" d="M7.5 32.5 H32.5"/>
+            <path class="lg-path" pathLength="1" d="M9 28 L16.5 20.5 L23 24 L29.5 14"/>
+            <circle class="lg-node" cx="9" cy="28" r="2.7"/>
+            <circle class="lg-node" cx="16.5" cy="20.5" r="2.7"/>
+            <circle class="lg-node" cx="23" cy="24" r="2.7"/>
+            <circle class="lg-ring" cx="29.5" cy="12" r="5"/>
+            <g transform="translate(29.5 12)"><path class="lg-star" d="M0 -5.6 L1.44 -1.98 L5.33 -1.73 L2.33 0.76 L3.29 4.53 L0 2.45 L-3.29 4.53 L-2.33 0.76 L-5.33 -1.73 L-1.44 -1.98Z"/></g>
+            <circle class="lg-comet" r="1.9" cx="0" cy="0"><animateMotion dur="1s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1" path="M9 28 L16.5 20.5 L23 24 L29.5 14"/></circle>
+          </svg></div>
+      <p class="wordmark boot-wordmark"><span data-wm>Job</span><b data-wm>Track</b></p>
+      <p class="mono mb-2 boot-label">LOADING SAVE DATA</p>
+      <div class="boot-bar" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+
+  <canvas id="world-bg" aria-hidden="true"></canvas>
+  <div id="scroll-progress" aria-hidden="true"></div>
+  <header class="app-header sticky-top">
+    <nav class="navbar navbar-expand-xl" aria-label="Main navigation">
+      <div class="container-xxl">
+        <a class="navbar-brand brand" href="#/dashboard">
+          <svg class="logo-svg" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true" focusable="false">
+            <rect class="lg-badge" x="1" y="1" width="38" height="38" rx="11"/>
+            <path class="lg-base" pathLength="1" d="M7.5 32.5 H32.5"/>
+            <path class="lg-path" pathLength="1" d="M9 28 L16.5 20.5 L23 24 L29.5 14"/>
+            <circle class="lg-node" cx="9" cy="28" r="2.7"/>
+            <circle class="lg-node" cx="16.5" cy="20.5" r="2.7"/>
+            <circle class="lg-node" cx="23" cy="24" r="2.7"/>
+            <circle class="lg-ring" cx="29.5" cy="12" r="5"/>
+            <g transform="translate(29.5 12)"><path class="lg-star" d="M0 -5.6 L1.44 -1.98 L5.33 -1.73 L2.33 0.76 L3.29 4.53 L0 2.45 L-3.29 4.53 L-2.33 0.76 L-5.33 -1.73 L-1.44 -1.98Z"/></g>
+            <circle class="lg-comet" r="1.9" cx="0" cy="0"><animateMotion dur="1s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1" path="M9 28 L16.5 20.5 L23 24 L29.5 14"/></circle>
+          </svg>
+          <span class="wordmark"><span data-wm>Job</span><b data-wm>Track</b></span>
+        </a>
+
+        <div class="d-flex align-items-center gap-2 order-xl-3 ms-auto">
+          <a class="hud-chip" id="hud" href="#/trophies" data-magnetic></a>
+          <button class="btn btn-icon d-none d-sm-inline-flex" data-action="open-palette" data-magnetic aria-label="Open command palette" title="Command palette (Ctrl+K)"><i class="bi bi-command"></i></button>
+          <button class="btn btn-primary d-none d-md-inline-flex align-items-center gap-1" data-action="add-app" data-magnetic><i class="bi bi-plus-lg" aria-hidden="true"></i> Add<span class="d-none d-xxl-inline">&nbsp;Application</span></button>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+
+        <div class="collapse navbar-collapse order-xl-2" id="mainNav">
+          <span class="nav-ink" id="nav-ink" aria-hidden="true"></span>
+          <ul class="navbar-nav ms-xl-3">
+            <li class="nav-item"><a class="nav-link" href="#/dashboard" data-route="dashboard"><i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/applications" data-route="applications"><i class="bi bi-collection" aria-hidden="true"></i> Applications</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/followups" data-route="followups"><i class="bi bi-bell" aria-hidden="true"></i> Follow-ups <span class="nav-badge" id="nav-overdue" hidden></span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#/contacts" data-route="contacts"><i class="bi bi-person-lines-fill" aria-hidden="true"></i> Contacts</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/trophies" data-route="trophies"><i class="bi bi-award" aria-hidden="true"></i> Trophies</a></li>
+            <li class="nav-item"><a class="nav-link" href="#/settings" data-route="settings"><i class="bi bi-gear" aria-hidden="true"></i> Settings</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="ticker" id="ticker" aria-label="Live activity feed">
+      <span class="ticker-tag"><span class="live-dot" aria-hidden="true"></span>Live feed</span>
+      <div class="ticker-viewport"><div class="ticker-track" id="ticker-track"></div></div>
+    </div>
+  </header>
+
+  <div id="banner" class="container-xxl"></div>
+
+  <main id="main" class="container-xxl py-4" tabindex="-1"></main>
+
+  <footer class="app-footer container-xxl">
+    <span>JobTrack · personal tracker · data stays in this browser</span>
+    <button class="btn btn-link btn-sm p-0" data-action="show-shortcuts"><kbd>?</kbd> shortcuts</button>
+  </footer>
+
+  <button class="fab d-md-none" data-action="add-app" data-magnetic aria-label="Add application"><i class="bi bi-plus-lg"></i></button>
+
+  <!-- Add / edit application -->
+  <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
+      <form class="modal-content" id="app-form" novalidate data-form="application">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow mb-0" id="appModalEyebrow">New entry</p>
+            <h2 class="modal-title h4" id="appModalTitle">Add Job Application</h2>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger form-summary d-none" role="alert" id="form-summary"></div>
+          <p class="small text-muted mb-3">Fields marked <span class="req">*</span> are required. Everything else is optional — you can add it later.</p>
+
+          <fieldset class="form-section">
+            <legend><i class="bi bi-briefcase" aria-hidden="true"></i> Job</legend>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="f-company" class="form-label">Company name <span class="req">*</span></label>
+                <input id="f-company" name="company" class="form-control" list="company-list" maxlength="120" autocomplete="off" required aria-describedby="err-company">
+                <datalist id="company-list"></datalist>
+                <div class="invalid-feedback" id="err-company"></div>
+              </div>
+              <div class="col-md-6">
+                <label for="f-jobTitle" class="form-label">Job title <span class="req">*</span></label>
+                <input id="f-jobTitle" name="jobTitle" class="form-control" maxlength="120" autocomplete="off" required aria-describedby="err-jobTitle">
+                <div class="invalid-feedback" id="err-jobTitle"></div>
+              </div>
+              <div class="col-6 col-md-4">
+                <label for="f-jobType" class="form-label">Job type</label>
+                <select id="f-jobType" name="jobType" class="form-select">
+                  <option>Internship</option><option>Full-time</option><option>Part-time</option><option>Other</option>
+                </select>
+              </div>
+              <div class="col-6 col-md-4">
+                <label for="f-location" class="form-label">Location</label>
+                <input id="f-location" name="location" class="form-control" maxlength="120" placeholder="City or Remote">
+              </div>
+              <div class="col-md-4">
+                <span class="form-label d-block" id="prio-label">Priority</span>
+                <div class="seg" role="radiogroup" aria-labelledby="prio-label">
+                  <input type="radio" class="btn-check" name="priority" id="p-high" value="High"><label class="seg-btn prio-high" for="p-high"><i class="bi bi-chevron-double-up" aria-hidden="true"></i> High</label>
+                  <input type="radio" class="btn-check" name="priority" id="p-med" value="Medium"><label class="seg-btn prio-medium" for="p-med"><i class="bi bi-chevron-up" aria-hidden="true"></i> Med</label>
+                  <input type="radio" class="btn-check" name="priority" id="p-low" value="Low"><label class="seg-btn prio-low" for="p-low"><i class="bi bi-chevron-down" aria-hidden="true"></i> Low</label>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <label for="f-jobUrl" class="form-label">Job posting URL</label>
+                <input id="f-jobUrl" name="jobUrl" type="url" class="form-control" maxlength="2048" placeholder="https://" aria-describedby="err-jobUrl">
+                <div class="invalid-feedback" id="err-jobUrl"></div>
+              </div>
+              <div class="col-md-4">
+                <label for="f-salary" class="form-label">Salary / stipend</label>
+                <input id="f-salary" name="salary" class="form-control" maxlength="120" placeholder="e.g. ₹30k / month">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><i class="bi bi-signpost-split" aria-hidden="true"></i> Progress</legend>
+            <div class="row g-3">
+              <div class="col-12">
+                <span class="form-label d-block" id="status-label">Application status <span class="req">*</span></span>
+                <div class="status-picker" role="radiogroup" aria-labelledby="status-label" aria-describedby="err-status" id="status-picker"></div>
+                <div class="invalid-feedback d-block" id="err-status"></div>
+              </div>
+              <div class="col-md-4">
+                <label for="f-applicationDate" class="form-label">Application date <span class="req">*</span></label>
+                <input id="f-applicationDate" name="applicationDate" type="date" class="form-control" required aria-describedby="err-applicationDate">
+                <div class="invalid-feedback" id="err-applicationDate"></div>
+              </div>
+              <div class="col-6 col-md-4">
+                <label for="f-deadline" class="form-label">Application deadline</label>
+                <input id="f-deadline" name="deadline" type="date" class="form-control" aria-describedby="err-deadline">
+                <div class="invalid-feedback" id="err-deadline"></div>
+              </div>
+              <div class="col-6 col-md-4">
+                <label for="f-interviewDate" class="form-label">Interview date</label>
+                <input id="f-interviewDate" name="interviewDate" type="date" class="form-control" aria-describedby="err-interviewDate">
+                <div class="invalid-feedback" id="err-interviewDate"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><i class="bi bi-person-badge" aria-hidden="true"></i> Recruiter contact <span class="small text-muted fw-normal">(optional)</span></legend>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="f-recruiterName" class="form-label">Recruiter name</label>
+                <input id="f-recruiterName" name="recruiterName" class="form-control" maxlength="120" autocomplete="off">
+              </div>
+              <div class="col-md-4">
+                <label for="f-recruiterEmail" class="form-label">Recruiter email</label>
+                <input id="f-recruiterEmail" name="recruiterEmail" type="email" class="form-control" maxlength="160" autocomplete="off" aria-describedby="err-recruiterEmail">
+                <div class="invalid-feedback" id="err-recruiterEmail"></div>
+              </div>
+              <div class="col-md-4">
+                <label for="f-recruiterPhone" class="form-label">Recruiter phone</label>
+                <input id="f-recruiterPhone" name="recruiterPhone" type="tel" class="form-control" maxlength="30" autocomplete="off" aria-describedby="err-recruiterPhone">
+                <div class="invalid-feedback" id="err-recruiterPhone"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-section">
+            <legend><i class="bi bi-bell" aria-hidden="true"></i> Follow-up &amp; notes</legend>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="f-followUpDate" class="form-label">Follow-up date</label>
+                <input id="f-followUpDate" name="followUpDate" type="date" class="form-control" aria-describedby="err-followUpDate">
+                <div class="invalid-feedback" id="err-followUpDate"></div>
+                <div class="quick-dates mt-1" aria-label="Quick follow-up dates">
+                  <button type="button" class="chip xs" data-quick-date="3">+3d</button>
+                  <button type="button" class="chip xs" data-quick-date="7">+1w</button>
+                  <button type="button" class="chip xs" data-quick-date="14">+2w</button>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <label for="f-followUpNote" class="form-label">Follow-up note</label>
+                <input id="f-followUpNote" name="followUpNote" class="form-control" maxlength="1000" placeholder="What should you ask or check?">
+              </div>
+              <div class="col-12">
+                <label for="f-notes" class="form-label">Personal notes</label>
+                <textarea id="f-notes" name="notes" class="form-control" rows="3" maxlength="4000" placeholder="Where you applied, referral, prep ideas…"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <span class="me-auto small text-muted d-none d-sm-inline"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to save</span>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="app-save"><i class="bi bi-floppy" aria-hidden="true"></i> Save Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-describedby="confirmMsg" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+      <div class="modal-content">
+        <div class="modal-body p-4">
+          <div class="confirm-icon" id="confirmIcon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></div>
+          <h2 class="h5 mt-3" id="confirmTitle">Are you sure?</h2>
+          <p class="text-muted mb-0" id="confirmMsg"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="confirmCancel">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmOk">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule follow-up -->
+  <div class="modal fade" id="followModal" tabindex="-1" aria-labelledby="followTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:460px">
+      <form class="modal-content" data-form="followup" novalidate>
+        <div class="modal-header">
+          <div><p class="eyebrow mb-0" id="followEyebrow">Company</p><h2 class="modal-title h5" id="followTitle">Schedule Follow-up</h2></div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="follow-id">
+          <label for="follow-date" class="form-label">Follow-up date</label>
+          <input type="date" class="form-control" id="follow-date" name="date" required aria-describedby="err-follow-date">
+          <div class="invalid-feedback" id="err-follow-date"></div>
+          <div class="quick-dates mt-2">
+            <button type="button" class="chip xs" data-follow-quick="1">Tomorrow</button>
+            <button type="button" class="chip xs" data-follow-quick="3">+3 days</button>
+            <button type="button" class="chip xs" data-follow-quick="7">+1 week</button>
+            <button type="button" class="chip xs" data-follow-quick="14">+2 weeks</button>
+          </div>
+          <label for="follow-note" class="form-label mt-3">Note (optional)</label>
+          <input class="form-control" id="follow-note" name="note" maxlength="1000" placeholder="e.g. Ask about interview feedback">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-calendar-check" aria-hidden="true"></i> Schedule Follow-up</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Level up -->
+  <div class="modal fade" id="levelModal" tabindex="-1" aria-labelledby="levelTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+      <div class="modal-content level-up text-center">
+        <div class="modal-body p-4">
+          <p class="eyebrow mb-1">Level up</p>
+          <div class="level-burst"><span class="mono" id="levelNum">2</span></div>
+          <h2 class="h4 mt-3" id="levelTitle">You reached level 2</h2>
+          <p class="text-muted mb-3" id="levelRank">New rank unlocked.</p>
+          <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command palette -->
+  <div class="modal fade" id="paletteModal" tabindex="-1" aria-label="Command palette" aria-hidden="true">
+    <div class="modal-dialog palette-dialog">
+      <div class="modal-content palette">
+        <div class="palette-search">
+          <i class="bi bi-command" aria-hidden="true"></i>
+          <input id="palette-input" class="form-control" placeholder="Type a command or search applications…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-label="Command">
+          <kbd>Esc</kbd>
+        </div>
+        <ul class="palette-list" id="palette-list" role="listbox"></ul>
+        <div class="palette-foot small"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>Enter</kbd> run</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shortcuts -->
+  <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+      <div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title h5" id="shortcutsTitle"><i class="bi bi-keyboard" aria-hidden="true"></i> Keyboard shortcuts</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+        <div class="modal-body" id="shortcuts-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+  <div id="fx-layer" aria-hidden="true"></div>
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+  <div id="wipe" aria-hidden="true">
+    <span class="wipe-bar"></span><span class="wipe-bar"></span><span class="wipe-bar"></span>
+    <span class="wipe-label mono" id="wipe-label"></span>
+  </div>
+  <div id="cursor" aria-hidden="true"><span class="cur-ring"><span class="cur-label"></span></span><span class="cur-dot"></span></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- GSAP 3.13 (free for all uses, plugins included) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/applications.js"></script>
+  <script src="js/form-validation.js"></script>
+  <script src="js/follow-ups.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/io.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/motion.js"></script>
+  <script src="js/logo.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/experience.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
